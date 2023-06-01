@@ -2,19 +2,19 @@
 
 #include "arm_book_lib.h"
 
-#include "smart_home_system.h"
+#include "smart_food_system.h"
 
-#include "alarm.h"
+// #include "alarm.h"
 #include "user_interface.h"
-#include "fire_alarm.h"
-#include "intruder_alarm.h"
+// #include "fire_alarm.h"
+// #include "intruder_alarm.h"
 #include "pc_serial_com.h"
 #include "event_log.h"
-#include "motion_sensor.h"
+// #include "motion_sensor.h"
 #include "motor.h"
-#include "gate.h"
-#include "light_system.h"
-#include "audio.h"
+// #include "gate.h"
+// #include "light_system.h"
+// #include "audio.h"
 #include "sd_card.h"
 
 //=====[Declaration of private defines]========================================
@@ -33,30 +33,30 @@
 
 //=====[Implementations of public functions]===================================
 
-void smartHomeSystemInit()
+void smartFoodSystemInit()
 {
-    audioInit();
+    // audioInit();
     userInterfaceInit();
-    alarmInit();
-    fireAlarmInit();
-    intruderAlarmInit();
+    // alarmInit();
+    // fireAlarmInit();
+    // intruderAlarmInit();
     pcSerialComInit();
     motorControlInit();
-    gateInit();
-    lightSystemInit();
+    // gateInit();
+    // lightSystemInit();
     sdCardInit();
 }
 
-void smartHomeSystemUpdate()
+void smartFoodSystemUpdate()
 {
     userInterfaceUpdate();
-    fireAlarmUpdate();
-    intruderAlarmUpdate();
-    alarmUpdate();
+    // fireAlarmUpdate();
+    // intruderAlarmUpdate();
+    // alarmUpdate();
     eventLogUpdate();
     pcSerialComUpdate();
     motorControlUpdate();
-    lightSystemUpdate();
+    // lightSystemUpdate();
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

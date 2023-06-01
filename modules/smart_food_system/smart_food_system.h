@@ -1,7 +1,7 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _SMART_HOME_SYSTEM_H_
-#define _SMART_HOME_SYSTEM_H_
+#ifndef _SMART_FOOD_SYSTEM_H_
+#define _SMART_FOOD_SYSTEM_H_
 
 //=====[Declaration of public defines]=========================================
 
@@ -11,9 +11,9 @@
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-void smartHomeSystemInit();
-void smartHomeSystemUpdate();
+void smartFoodSystemInit();
+void smartFoodSystemUpdate();
 
 //=====[#include guards - end]=================================================
 
-#endif // _SMART_HOME_SYSTEM_H_
+#endif // _SMART_FOOD_SYSTEM_H_

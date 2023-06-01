@@ -50,19 +50,19 @@ void lightSystemBrightnessChangeRGBFactor( lightSystem_t light, bool state )
     switch( light ) {
         case RGB_LED_RED:
             if ( state ) brightnessRGBLedRedFactor+=0.1;
-                else brightnessRGBLedRedFactor-=0.1;
+            else brightnessRGBLedRedFactor-=0.1;
             if ( brightnessRGBLedRedFactor > 1) brightnessRGBLedRedFactor=1.0;
             if ( brightnessRGBLedRedFactor < 0) brightnessRGBLedRedFactor=0.0; 
         break;
         case RGB_LED_GREEN:
             if ( state ) brightnessRGBLedGreenFactor+=0.1;
-                else brightnessRGBLedGreenFactor-=0.1;  
+            else brightnessRGBLedGreenFactor-=0.1;  
             if ( brightnessRGBLedGreenFactor > 1) brightnessRGBLedGreenFactor=1.0;
             if ( brightnessRGBLedGreenFactor < 0) brightnessRGBLedGreenFactor=0.0;      
         break;
         case RGB_LED_BLUE:
             if ( state ) brightnessRGBLedBlueFactor+=0.1;
-                else brightnessRGBLedBlueFactor-=0.1;   
+            else brightnessRGBLedBlueFactor-=0.1;   
             if ( brightnessRGBLedBlueFactor > 1) brightnessRGBLedBlueFactor=1.0;
             if ( brightnessRGBLedBlueFactor < 0) brightnessRGBLedBlueFactor=0.0;
         break;

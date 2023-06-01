@@ -4,7 +4,7 @@
 
 #include "temperature_sensor.h"
 
-#include "smart_home_system.h"
+#include "smart_food_system.h"
 
 //=====[Declaration of private defines]========================================
 

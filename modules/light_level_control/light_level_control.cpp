@@ -2,7 +2,7 @@
 
 #include "arm_book_lib.h"
 
-#include "smart_home_system.h"
+#include "smart_food_system.h"
 #include "light_level_control.h"
 
 //=====[Declaration of private defines]========================================

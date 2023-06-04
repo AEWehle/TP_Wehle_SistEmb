@@ -1,0 +1,121 @@
+//=====[Libraries]=============================================================
+
+#include "mbed.h"
+#include "arm_book_lib.h"
+
+#include "bowl.h"
+#include "load_sensorHX711.h"
+
+//=====[Declaration of private defines]========================================
+
+//=====[Declaration of private data types]=====================================
+
+//=====[Declaration and initialization of public global objects]===============
+
+const PinName DOUT = A1;
+const PinName CLK = A0;
+HX711 balanza(DOUT, CLK);
+
+//=====[Declaration of external public global variables]=======================
+
+//=====[Declaration and initialization of public global variables]=============
+
+//=====[Declaration and initialization of private global variables]============
+
+static bool overLoadDetected      = OFF;
+static bool overLoadDetectorState = OFF;
+static int max_food_load = 200;  // lo establce el usuario
+static int food_load = 0; // en gramos
+static int last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
+static int time_count_bowl = 0;
+
+//=====[Declarations (prototypes) of private functions]========================
+
+
+//=====[Para calibrar la celda de carga]=======================================
+
+void bowl_tare() {
+//   Serial.begin(9600);
+//   balanza.begin(DOUT, CLK);
+//   Serial.print("Lectura del valor del ADC:t");
+//   Serial.println(balanza.read());
+    balanza.read();
+//   Serial.println("No ponga ningún objeto sobre la balanza");
+//   Serial.println("Destarando...");
+    balanza.set_scale(); //La escala por defecto es 1
+    balanza.tare(20);  //El peso actual es considerado Tara.
+    // Serial.println("Coloque un peso conocido:");
+}
+
+
+// calibrar escala luego de tara
+void bowl_calibrate() {
+//   Serial.begin(9600);
+//   balanza.begin(DOUT, CLK);
+//   Serial.print("Lectura del valor del ADC:  ");
+//   Serial.println(balanza.read());
+    int test_load = 200; // para medir en gramos probamos en gramos, en este caso 200
+    int scale = balanza.read_average(20)/test_load;
+//   Serial.println("No ponga ningun  objeto sobre la balanza");
+//   Serial.println("Destarando...");
+//   Serial.println("...");
+    balanza.set_scale(scale); // Establecemos la escala
+}
+
+
+
+//=============================================================================
+
+
+//=====[Implementations of public functions]===================================
+
+void bowlInit()
+{
+    bowl_tare();
+}
+
+int get_food_load() {
+    food_load = balanza.get_units(20);
+    return food_load;
+}
+
+void bowlUpdate()
+{
+    overLoadDetectorState = get_food_load() > max_food_load;
+
+    if ( overLoadDetectorState ) {
+        overLoadDetected = ON;
+    }
+
+    time_count_bowl++;
+    if ( time_count_bowl >= MINUTE_BOWL ){
+        time_count_bowl = 0;
+        last_minute_food_load = food_load;
+    }
+}
+
+
+int  get_last_minute_food_load(){
+    return last_minute_food_load;
+}
+
+void set_max_food_load(int max_load){
+    max_food_load = max_load;
+}
+
+bool overLoadDetectorStateRead()
+{
+    return overLoadDetectorState;
+}
+
+bool overLoadDetectedRead()
+{
+    return overLoadDetected;
+}
+
+void overLoadDeactivate()
+{
+    overLoadDetected = OFF;
+}
+
+//=====[Implementations of private functions]==================================

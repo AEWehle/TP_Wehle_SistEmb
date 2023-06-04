@@ -1,17 +1,9 @@
 //=====[Libraries]=============================================================
 
+#include "mbed.h"
 #include "arm_book_lib.h"
 
-#include "smart_food_system.h"
-
-#include "user_interface.h"
-#include "pc_serial_com.h"
-#include "event_log.h"
-#include "motor.h"
-#include "sd_card.h"
-#include "bowl.h"
-#include "food_storage.h"
-
+#include "infrared_sensor.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -25,35 +17,44 @@
 
 //=====[Declaration and initialization of private global variables]============
 
+static bool underStorageDetected = OFF;
+static bool underStorageDetectorState = OFF;
+
 //=====[Declarations (prototypes) of private functions]========================
 
 //=====[Implementations of public functions]===================================
 
-
-// cree las carpetas load sensor, bowl, food storage y infrared-sensor
-
-void smartFoodSystemInit()
+void foodStorageInit()
 {
-    userInterfaceInit();
-    pcSerialComInit();
-    motorControlInit();
-    sdCardInit();
-
-    // agregados para el dispenser
-    bowlInit();
-    foodStorageInit();
+    infraredSensorInit();
 }
 
-void smartFoodSystemUpdate()
-{    
-    bowlUpdate();
-    foodStorageUpdate();
-    
-    userInterfaceUpdate();
-    eventLogUpdate();
-    pcSerialComUpdate();
-    motorControlUpdate();
-    delay(SYSTEM_TIME_INCREMENT_MS);
+void foodStorageUpdate()
+{
+    infraredSensorUpdate();
+
+    underStorageDetectorState = !infraredSensorRead();
+
+    if ( underStorageDetectorState ) {
+        underStorageDetected = ON;
+    }
+}
+
+bool underStorageDetectorStateRead()
+{
+    return underStorageDetectorState;
+}
+
+
+bool underStorageDetectedRead()
+{
+    return underStorageDetected;
+}
+
+
+void foodStorageDeactivate()
+{
+    underStorageDetected = OFF;    
 }
 
 //=====[Implementations of private functions]==================================

@@ -20,7 +20,7 @@
 // #include "GLCD_intruder_alarm.h"
 #include "motor.h"
 // #include "gate.h"
-#include "light_system.h"
+// #include "light_system.h"
 // #include "light_level_control.h"
 
 //=====[Declaration of private defines]========================================

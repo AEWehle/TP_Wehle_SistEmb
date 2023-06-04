@@ -5,12 +5,12 @@
 
 #include "event_log.h"
 
-#include "siren.h"
-#include "fire_alarm.h"
+// #include "siren.h"
+// #include "fire_alarm.h"
 #include "user_interface.h"
 #include "date_and_time.h"
 #include "pc_serial_com.h"
-#include "motion_sensor.h"
+// #include "motion_sensor.h"
 #include "sd_card.h"
 
 //=====[Declaration of private defines]========================================
@@ -31,12 +31,12 @@ typedef struct systemEvent {
 
 //=====[Declaration and initialization of private global variables]============
 
-static bool sirenLastState = OFF;
-static bool gasLastState   = OFF;
-static bool tempLastState  = OFF;
-static bool ICLastState    = OFF;
-static bool SBLastState    = OFF;
-static bool motionLastState         = OFF;
+// static bool sirenLastState = OFF;
+// static bool gasLastState   = OFF;
+// static bool tempLastState  = OFF;
+// static bool ICLastState    = OFF;
+// static bool SBLastState    = OFF;
+// static bool motionLastState         = OFF;
 static int eventsIndex     = 0;
 static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 
@@ -50,29 +50,29 @@ static void eventLogElementStateUpdate( bool lastState,
 
 void eventLogUpdate()
 {
-    bool currentState = sirenStateRead();
-    eventLogElementStateUpdate( sirenLastState, currentState, "ALARM" );
-    sirenLastState = currentState;
+    // bool currentState = sirenStateRead();
+    // eventLogElementStateUpdate( sirenLastState, currentState, "ALARM" );
+    // sirenLastState = currentState;
 
-    currentState = gasDetectorStateRead();
-    eventLogElementStateUpdate( gasLastState, currentState, "GAS_DET" );
-    gasLastState = currentState;
+    // currentState = gasDetectorStateRead();
+    // eventLogElementStateUpdate( gasLastState, currentState, "GAS_DET" );
+    // gasLastState = currentState;
 
-    currentState = overTemperatureDetectorStateRead();
-    eventLogElementStateUpdate( tempLastState, currentState, "OVER_TEMP" );
-    tempLastState = currentState;
+    // currentState = overTemperatureDetectorStateRead();
+    // eventLogElementStateUpdate( tempLastState, currentState, "OVER_TEMP" );
+    // tempLastState = currentState;
 
-    currentState = incorrectCodeStateRead();
-    eventLogElementStateUpdate( ICLastState, currentState, "LED_IC" );
-    ICLastState = currentState;
+    // currentState = incorrectCodeStateRead();
+    // eventLogElementStateUpdate( ICLastState, currentState, "LED_IC" );
+    // ICLastState = currentState;
 
-    currentState = systemBlockedStateRead();
-    eventLogElementStateUpdate( SBLastState ,currentState, "LED_SB" );
-    SBLastState = currentState;
+    // currentState = systemBlockedStateRead();
+    // eventLogElementStateUpdate( SBLastState ,currentState, "LED_SB" );
+    // SBLastState = currentState;
 
-    currentState = motionSensorRead();
-    eventLogElementStateUpdate( motionLastState ,currentState, "MOTION" );
-    motionLastState = currentState;
+    // currentState = motionSensorRead();
+    // eventLogElementStateUpdate( motionLastState ,currentState, "MOTION" );
+    // motionLastState = currentState;
 }
 
 int eventLogNumberOfStoredEvents()

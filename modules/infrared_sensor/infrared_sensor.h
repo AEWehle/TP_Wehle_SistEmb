@@ -1,7 +1,7 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _USER_INTERFACE_H_
-#define _USER_INTERFACE_H_
+#ifndef _INFRARED_SENSOR_H_
+#define _INFRARED_SENSOR_H_
 
 //=====[Declaration of public defines]=========================================
 
@@ -9,17 +9,10 @@
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-void userInterfaceInit();
-void userInterfaceUpdate();
-// bool userInterfaceCodeCompleteRead();
-// void userInterfaceCodeCompleteWrite( bool state );
-
-// bool incorrectCodeStateRead();
-// void incorrectCodeStateWrite( bool state );
-
-// bool systemBlockedStateRead();
-// void systemBlockedStateWrite( bool state );
+void infraredSensorInit();
+void infraredSensorUpdate();
+bool infraredSensorRead();
 
 //=====[#include guards - end]=================================================
 
-#endif // _USER_INTERFACE_H_
+#endif // _INFRARED_SENSOR_H_

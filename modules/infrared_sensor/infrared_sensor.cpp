@@ -1,23 +1,16 @@
 //=====[Libraries]=============================================================
 
-#include "arm_book_lib.h"
+#include "mbed.h"
 
-#include "smart_food_system.h"
-
-#include "user_interface.h"
-#include "pc_serial_com.h"
-#include "event_log.h"
-#include "motor.h"
-#include "sd_card.h"
-#include "bowl.h"
-#include "food_storage.h"
-
+#include "infrared_sensor.h"
 
 //=====[Declaration of private defines]========================================
 
 //=====[Declaration of private data types]=====================================
 
 //=====[Declaration and initialization of public global objects]===============
+
+DigitalIn infrared(PE_12);
 
 //=====[Declaration of external public global variables]=======================
 
@@ -29,31 +22,18 @@
 
 //=====[Implementations of public functions]===================================
 
-
-// cree las carpetas load sensor, bowl, food storage y infrared-sensor
-
-void smartFoodSystemInit()
+void infraredSensorInit()
 {
-    userInterfaceInit();
-    pcSerialComInit();
-    motorControlInit();
-    sdCardInit();
-
-    // agregados para el dispenser
-    bowlInit();
-    foodStorageInit();
 }
 
-void smartFoodSystemUpdate()
-{    
-    bowlUpdate();
-    foodStorageUpdate();
-    
-    userInterfaceUpdate();
-    eventLogUpdate();
-    pcSerialComUpdate();
-    motorControlUpdate();
-    delay(SYSTEM_TIME_INCREMENT_MS);
+void infraredSensorUpdate()
+{
+}
+
+bool infraredSensorRead()
+{
+    return infrared;
 }
 
 //=====[Implementations of private functions]==================================
+

@@ -1,7 +1,7 @@
 //=====[#include guards - begin]===============================================
 
-#ifndef _USER_INTERFACE_H_
-#define _USER_INTERFACE_H_
+#ifndef _FOOD_STORAGE_H_
+#define _FOOD_STORAGE_H_
 
 //=====[Declaration of public defines]=========================================
 
@@ -9,17 +9,14 @@
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-void userInterfaceInit();
-void userInterfaceUpdate();
-// bool userInterfaceCodeCompleteRead();
-// void userInterfaceCodeCompleteWrite( bool state );
+void foodStorageInit();
+void foodStorageUpdate();
+void foodStorageDeactivate();
 
-// bool incorrectCodeStateRead();
-// void incorrectCodeStateWrite( bool state );
+bool foodStorageStateRead();
+bool foodStorageRead();
 
-// bool systemBlockedStateRead();
-// void systemBlockedStateWrite( bool state );
 
 //=====[#include guards - end]=================================================
 
-#endif // _USER_INTERFACE_H_
+#endif // _FOOD_STORAGE_H_

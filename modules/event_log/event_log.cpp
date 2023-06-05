@@ -5,8 +5,6 @@
 
 #include "event_log.h"
 
-// #include "siren.h"
-// #include "fire_alarm.h"
 #include "user_interface.h"
 #include "date_and_time.h"
 #include "pc_serial_com.h"
@@ -86,9 +84,9 @@ int eventLogNumberOfStoredEvents()
 void eventLogRead( int index, char* str )
 {
     str[0] = '\0';
-    strcat( str, "Event = " );
+    strcat( str, "Evento = " );
     strcat( str, arrayOfStoredEvents[index].typeOfEvent );
-    strcat( str, "\r\nDate and Time = " );
+    strcat( str, "\r\nFecha y hora = " );
     strcat( str, ctime(&arrayOfStoredEvents[index].seconds) );
     strcat( str, "\r\n" );
 }
@@ -134,9 +132,9 @@ bool eventLogSaveToSdCard()
             eventLogRead( i, eventStr );
             if ( sdCardWriteFile( fileName, eventStr ) ){
                 arrayOfStoredEvents[i].storedInSd = true;
-                pcSerialComStringWrite("Storing event ");
+                pcSerialComStringWrite("Guardando evento ");
                 pcSerialComIntWrite(i+1);
-                pcSerialComStringWrite(" in file ");
+                pcSerialComStringWrite(" en archivo ");
                 pcSerialComStringWrite(fileName);
                 pcSerialComStringWrite("\r\n");
                 eventsStored = true;
@@ -145,9 +143,9 @@ bool eventLogSaveToSdCard()
     }
 
     if ( eventsStored ) {
-        pcSerialComStringWrite("New events successfully stored in the SD card\r\n\r\n");
+        pcSerialComStringWrite("Nuevos eventos guardados correctamente en la tarjeta SD\r\n\r\n");
     } else {
-        pcSerialComStringWrite("No new events to store in the SD card\r\n\r\n");
+        pcSerialComStringWrite("No hay eventos para guardar en la tarjeta SD\r\n\r\n");
     }
 
     return true;

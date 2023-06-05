@@ -11,10 +11,8 @@
 
 void foodStorageInit();
 void foodStorageUpdate();
-void foodStorageDeactivate();
 
-bool foodStorageStateRead();
-bool foodStorageRead();
+bool underStorageDetectorStateRead();
 
 
 //=====[#include guards - end]=================================================

@@ -9,6 +9,7 @@
 
 #define MINUTE_BOWL  (60000/SYSTEM_TIME_INCREMENT_MS)
 #define FOOD_LOAD_LIMIT               1000.0
+#define TOLERANCIA 5
 
 //=====[Declaration of public data types]======================================
 
@@ -16,12 +17,14 @@
 
 void bowlInit();
 void bowlUpdate();
-int  get_food_load();
-int  get_last_minute_food_load();
-void set_max_food_load(int max_food_load);
+float  get_food_load();
+float  get_last_minute_food_load();
+void set_max_food_load(float max_food_load);
 
 bool overLoadStateRead();
-bool overLoadRead();
+void disableOverLoadState();
+bool foodIncreasedStateRead();
+bool foodDecreasedStateRead();
 
 void bowl_tare();
 void bowl_calibrate();

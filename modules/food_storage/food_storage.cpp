@@ -17,7 +17,6 @@
 
 //=====[Declaration and initialization of private global variables]============
 
-static bool underStorageDetected = OFF;
 static bool underStorageDetectorState = OFF;
 
 //=====[Declarations (prototypes) of private functions]========================
@@ -35,9 +34,6 @@ void foodStorageUpdate()
 
     underStorageDetectorState = !infraredSensorRead();
 
-    if ( underStorageDetectorState ) {
-        underStorageDetected = ON;
-    }
 }
 
 bool underStorageDetectorStateRead()
@@ -45,16 +41,5 @@ bool underStorageDetectorStateRead()
     return underStorageDetectorState;
 }
 
-
-bool underStorageDetectedRead()
-{
-    return underStorageDetected;
-}
-
-
-void foodStorageDeactivate()
-{
-    underStorageDetected = OFF;    
-}
 
 //=====[Implementations of private functions]==================================

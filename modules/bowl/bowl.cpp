@@ -22,11 +22,12 @@ HX711 balanza(DOUT, CLK);
 
 //=====[Declaration and initialization of private global variables]============
 
-static bool overLoadDetected      = OFF;
-static bool overLoadDetectorState = OFF;
-static int max_food_load = 200;  // lo establce el usuario
-static int food_load = 0; // en gramos
-static int last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
+static bool overLoadState = OFF;
+static bool foodIncreasedDetected      = OFF;
+static bool foodDecreasedDetected      = OFF;
+static float max_food_load = 200;  // lo establce el usuario
+static float food_load = 0; // en gramos
+static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
 static int time_count_bowl = 0;
 
 //=====[Declarations (prototypes) of private functions]========================
@@ -54,8 +55,8 @@ void bowl_calibrate() {
 //   balanza.begin(DOUT, CLK);
 //   Serial.print("Lectura del valor del ADC:  ");
 //   Serial.println(balanza.read());
-    int test_load = 200; // para medir en gramos probamos en gramos, en este caso 200
-    int scale = balanza.read_average(20)/test_load;
+     float test_load = 200; // para medir en gramos probamos en gramos, en este caso 200
+     float scale = balanza.read_average(20)/test_load;
 //   Serial.println("No ponga ningun  objeto sobre la balanza");
 //   Serial.println("Destarando...");
 //   Serial.println("...");
@@ -74,28 +75,38 @@ void bowlInit()
     bowl_tare();
 }
 
-int get_food_load() {
+float get_food_load() {
     food_load = balanza.get_units(20);
     return food_load;
 }
 
 void bowlUpdate()
 {
-    overLoadDetectorState = get_food_load() > max_food_load;
-
-    if ( overLoadDetectorState ) {
-        overLoadDetected = ON;
-    }
-
+   
+    overLoadState = get_food_load() > max_food_load;
+    
     time_count_bowl++;
     if ( time_count_bowl >= MINUTE_BOWL ){
         time_count_bowl = 0;
-        last_minute_food_load = food_load;
+
+        if( last_minute_food_load > (food_load * (1 + TOLERANCIA))){
+            foodDecreasedDetected = ON;
+            foodIncreasedDetected = OFF;
+            last_minute_food_load = food_load;
+        }
+        else if( last_minute_food_load < (food_load * (1 - TOLERANCIA))) {
+            foodDecreasedDetected = OFF;
+            foodIncreasedDetected = ON;
+            last_minute_food_load = food_load;
+        }
+        else{
+            foodDecreasedDetected = OFF;
+            foodIncreasedDetected = OFF;
+        }
     }
 }
 
-
-int  get_last_minute_food_load(){
+float  get_last_minute_food_load(){
     return last_minute_food_load;
 }
 
@@ -103,19 +114,28 @@ void set_max_food_load(int max_load){
     max_food_load = max_load;
 }
 
-bool overLoadDetectorStateRead()
+bool overLoadStateRead()
 {
-    return overLoadDetectorState;
+    return overLoadState;
 }
 
-bool overLoadDetectedRead()
+void disableOverLoadState()
 {
-    return overLoadDetected;
+    overLoadState = OFF;
 }
 
-void overLoadDeactivate()
+
+bool foodIncreasedStateRead()
 {
-    overLoadDetected = OFF;
+    return foodIncreasedDetected;
 }
+
+
+bool foodDecreasedStateRead()
+{
+    return foodDecreasedDetected;
+}
+
+
 
 //=====[Implementations of private functions]==================================

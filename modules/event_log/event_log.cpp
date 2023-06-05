@@ -10,8 +10,9 @@
 #include "user_interface.h"
 #include "date_and_time.h"
 #include "pc_serial_com.h"
-// #include "motion_sensor.h"
 #include "sd_card.h"
+#include "bowl.h"
+#include "food_storage.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -31,12 +32,10 @@ typedef struct systemEvent {
 
 //=====[Declaration and initialization of private global variables]============
 
-// static bool sirenLastState = OFF;
-// static bool gasLastState   = OFF;
-// static bool tempLastState  = OFF;
-// static bool ICLastState    = OFF;
-// static bool SBLastState    = OFF;
-// static bool motionLastState         = OFF;
+
+static bool foodIncreasedLastState         = OFF;
+static bool foodDecreasedLastState         = OFF;
+static bool underStorageLastState         = OFF;
 static int eventsIndex     = 0;
 static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 
@@ -50,9 +49,13 @@ static void eventLogElementStateUpdate( bool lastState,
 
 void eventLogUpdate()
 {
-    // bool currentState = sirenStateRead();
-    // eventLogElementStateUpdate( sirenLastState, currentState, "ALARM" );
-    // sirenLastState = currentState;
+    bool currentState = foodIncreasedStateRead();
+    eventLogElementStateUpdate( foodIncreasedLastState, currentState, "Aumento de comida a " );
+    foodIncreasedLastState = currentState;
+
+    currentState = foodDecreasedStateRead();
+    eventLogElementStateUpdate( foodDecreasedLastState, currentState, "Dismiución de comida a " );
+    foodDecreasedLastState = currentState;
 
     // currentState = gasDetectorStateRead();
     // eventLogElementStateUpdate( gasLastState, currentState, "GAS_DET" );
@@ -92,17 +95,13 @@ void eventLogRead( int index, char* str )
 
 void eventLogWrite( bool currentState, const char* elementName )
 {
-    char eventAndStateStr[EVENT_LOG_NAME_MAX_LENGTH] = "";
+    char eventStr[EVENT_LOG_NAME_MAX_LENGTH] = "";
 
-    strcat( eventAndStateStr, elementName );
-    if ( currentState ) {
-        strcat( eventAndStateStr, "_ON" );
-    } else {
-        strcat( eventAndStateStr, "_OFF" );
-    }
-
+    strcat( eventStr, elementName );
+    sprintf( eventStr, " %.2f gr.", get_food_load() );
+    
     arrayOfStoredEvents[eventsIndex].seconds = time(NULL);
-    strcpy( arrayOfStoredEvents[eventsIndex].typeOfEvent, eventAndStateStr );
+    strcpy( arrayOfStoredEvents[eventsIndex].typeOfEvent, eventStr );
     arrayOfStoredEvents[eventsIndex].storedInSd = false;
     if ( eventsIndex < EVENT_LOG_MAX_STORAGE - 1 ) {
         eventsIndex++;
@@ -110,7 +109,7 @@ void eventLogWrite( bool currentState, const char* elementName )
         eventsIndex = 0;
     }
 
-    pcSerialComStringWrite(eventAndStateStr);
+    pcSerialComStringWrite(eventStr);
     pcSerialComStringWrite("\r\n");
 }
 
@@ -159,7 +158,7 @@ static void eventLogElementStateUpdate( bool lastState,
                                         bool currentState,
                                         const char* elementName )
 {
-    if ( lastState != currentState ) {        
+    if ( (lastState == OFF) && (currentState == ON) ) {        
         eventLogWrite( currentState, elementName );       
     }
 }

@@ -7,18 +7,25 @@
 
 //=====[Declaration of public data types]======================================
 
+// typedef enum {
+//     DIRECTION_1,
+//     DIRECTION_2,
+//     STOPPED
+// } motorDirection_t;
+
 typedef enum {
-    DIRECTION_1,
-    DIRECTION_2,
+    ACTIVE,
     STOPPED
 } motorDirection_t;
 
 //=====[Declarations (prototypes) of public functions]=========================
 
 void motorControlInit();
-void motorDirectionWrite( motorDirection_t direction );
+// void motorDirectionWrite( motorDirection_t direction );
+void motorActivation();
+void motorDeactivation();
 
-motorDirection_t motorDirectionRead();
+motorDirection_t motorStateRead();
 
 void motorControlUpdate();
 

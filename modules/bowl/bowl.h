@@ -17,12 +17,10 @@
 
 void bowlInit();
 void bowlUpdate();
+void bowl_charge();
 float  get_food_load();
 float  get_last_minute_food_load();
 void set_max_food_load(float max_food_load);
-
-bool overLoadStateRead();
-void disableOverLoadState();
 bool foodIncreasedStateRead();
 bool foodDecreasedStateRead();
 

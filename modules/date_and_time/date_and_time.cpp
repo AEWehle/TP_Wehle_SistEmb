@@ -24,8 +24,9 @@ char* dateAndTimeRead()
 {
     time_t epochSeconds;
     epochSeconds = time(NULL);
-    return ctime(&epochSeconds);    
+    return ctime(&epochSeconds);    //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
 }
+
 
 void dateAndTimeWrite( int year, int month, int day, 
                        int hour, int minute, int second )

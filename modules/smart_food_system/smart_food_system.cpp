@@ -11,6 +11,7 @@
 #include "sd_card.h"
 #include "bowl.h"
 #include "food_storage.h"
+#include "time_for_food.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -40,15 +41,16 @@ void smartFoodSystemInit()
     sdCardInit();
 
     // agregados para el dispenser
+    timeForFoodInit();
     bowlInit();
     foodStorageInit();
 }
 
 void smartFoodSystemUpdate()
-{    
+{   
+    timeForFoodUpdate();
     bowlUpdate();
     foodStorageUpdate();
-    
     userInterfaceUpdate();
     eventLogUpdate();
     pcSerialComUpdate();

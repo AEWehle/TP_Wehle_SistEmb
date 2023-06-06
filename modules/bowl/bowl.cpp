@@ -5,6 +5,7 @@
 
 #include "bowl.h"
 #include "load_sensorHX711.h"
+#include "motor.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -22,16 +23,17 @@ HX711 balanza(DOUT, CLK);
 
 //=====[Declaration and initialization of private global variables]============
 
-static bool overLoadState = OFF;
+static bool chargingState = OFF;
 static bool foodIncreasedDetected      = OFF;
 static bool foodDecreasedDetected      = OFF;
-static float max_food_load = 200;  // lo establce el usuario
+static float food_load_required = 100;  // lo establce el usuario
 static float food_load = 0; // en gramos
 static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
 static int time_count_bowl = 0;
 
 //=====[Declarations (prototypes) of private functions]========================
 
+//=====[Implementations of public functions]===================================
 
 //=====[Para calibrar la celda de carga]=======================================
 
@@ -64,15 +66,14 @@ void bowl_calibrate() {
 }
 
 
-
-//=============================================================================
-
-
-//=====[Implementations of public functions]===================================
-
 void bowlInit()
 {
     bowl_tare();
+}
+
+void bowl_charge(){
+    motorActivation();
+    chargingState = ON;
 }
 
 float get_food_load() {
@@ -82,9 +83,11 @@ float get_food_load() {
 
 void bowlUpdate()
 {
-   
-    overLoadState = get_food_load() > max_food_load;
-    
+    if( (get_food_load() > food_load_required) && chargingState ){
+        motorDeactivation();
+        chargingState = OFF;
+    }
+
     time_count_bowl++;
     if ( time_count_bowl >= MINUTE_BOWL ){
         time_count_bowl = 0;
@@ -110,20 +113,9 @@ float  get_last_minute_food_load(){
     return last_minute_food_load;
 }
 
-void set_max_food_load(int max_load){
-    max_food_load = max_load;
+void set_food_load_required(int max_load){
+    food_load_required = max_load;
 }
-
-bool overLoadStateRead()
-{
-    return overLoadState;
-}
-
-void disableOverLoadState()
-{
-    overLoadState = OFF;
-}
-
 
 bool foodIncreasedStateRead()
 {

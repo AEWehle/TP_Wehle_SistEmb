@@ -22,7 +22,8 @@
 //=====[Declaration and initialization of public global variables]=============
 
 const int MAX_TIMES_DAY = 50;
-static char* times_for_food[MAX_TIMES_DAY];
+static int timesIndex = 1;
+static char times_for_food[MAX_TIMES_DAY][6] = {"08:00", "20:00"};
 
 //=====[Declaration and initialization of private global variables]============
 
@@ -49,8 +50,6 @@ void time_for_food_init()
 {    
     food_mode = CLOSED; // se entrega comida hasta que en el tacho haya MAX_FOOD_LOAD en el bowl
     set_max_food_load( FOOD_LOAD_DEFAULT );
-    times_for_food[0] = "08:00";
-    times_for_food[1] = "20:00";
 }
 
 void time_for_food_update()
@@ -61,8 +60,24 @@ void time_for_food_update()
     }
 }
 
-void set_time_for_food( int hora, int minute){
-
+void add_time_for_food( char new_time[6] ){
+     if ( timesIndex < MAX_TIMES_DAY )
+     {
+        timesIndex++;
+        for ( int i = 0; i<6 ; i++ )
+        {
+        times_for_food[timesIndex][I] = new_ime[i]
+        }
+     }
 }
+
+void change_a_time( char time[6], int index ){
+     for ( int i = 0; i<6 ; i++ )
+     {
+     times_for_food[index][i] = time[i];
+     }
+}
+
+
 
 //=====[Implementations of private functions]==================================

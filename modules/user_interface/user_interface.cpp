@@ -5,23 +5,11 @@
 
 #include "user_interface.h"
 
-// #include "code.h"
-// #include "alarm.h"
 #include "smart_food_system.h"
-// #include "fire_alarm.h"
-// #include "intruder_alarm.h"
 #include "date_and_time.h"
-// #include "temperature_sensor.h"
-// #include "gas_sensor.h"
-// #include "motion_sensor.h"
-// #include "matrix_keypad.h"
 #include "display.h"
-// #include "GLCD_fire_alarm.h"
-// #include "GLCD_intruder_alarm.h"
 #include "motor.h"
-// #include "gate.h"
-// #include "light_system.h"
-// #include "light_level_control.h"
+#include "bowl.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -52,8 +40,8 @@ typedef enum {
 //=====[Declaration and initialization of private global variables]============
 
 static displayState_t displayState = DISPLAY_REPORT_STATE;
-static int displayFireAlarmGraphicSequence = 0;
-static int displayIntruderAlarmGraphicSequence = 0;
+// static int displayFireAlarmGraphicSequence = 0;
+// static int displayIntruderAlarmGraphicSequence = 0;
 static int displayRefreshTimeMs = DISPLAY_REFRESH_TIME_REPORT_MS;
 
 // static bool incorrectCodeState = OFF;
@@ -72,8 +60,8 @@ static void userInterfaceDisplayInit();
 static void userInterfaceDisplayUpdate();
 static void userInterfaceDisplayReportStateInit();
 static void userInterfaceDisplayReportStateUpdate();
-static void userInterfaceDisplayAlarmStateInit();
-static void userInterfaceDisplayAlarmStateUpdate();
+// static void userInterfaceDisplayAlarmStateInit();
+// static void userInterfaceDisplayAlarmStateUpdate();
 
 // static void gateOpenButtonCallback();
 // static void gateCloseButtonCallback();
@@ -202,25 +190,37 @@ static void userInterfaceDisplayReportStateInit()
     displayClear();
 
     displayCharPositionWrite ( 0,0 );
-    displayStringWrite( "Temperature:" );
-
+    displayStringWrite( "  /  /     :  |  :  " );
     displayCharPositionWrite ( 0,1 );
-    displayStringWrite( "Gas:" );
-
+    displayStringWrite( "Peso:         |  :  " );
     displayCharPositionWrite ( 0,2 );
-    displayStringWrite( "Alarm:" );
+    displayStringWrite( "Alm.       :  |  :  " );
+    displayCharPositionWrite ( 0,3 );
+    displayStringWrite( "  Ajustes  :  |  :  " );
 }
 
 static void userInterfaceDisplayReportStateUpdate()
 {
-    char temperatureString[3] = "";
+    char actualTimeString[3] = "";
+    time_t rawtime;
+    struct tm * timeinfo;
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
+    displayCharPositionWrite ( 0,0 );
+    sprintf(actualTimeString, "%.0f", get_food_load());
+    displayStringWrite( actualTimeString );
+    timeinfo->tm_mon,
+    timeinfo->tm_mday, timeinfo->tm_hour,
+    timeinfo->tm_min, timeinfo->tm_sec,
+    1900 + timeinfo->tm_year);
 
-    // sprintf(temperatureString, "%.0f", temperatureSensorReadCelsius());
-    sprintf(temperatureString, "%.0f", 0.0);
-    displayCharPositionWrite ( 12,0 );
-    displayStringWrite( temperatureString );
-    displayCharPositionWrite ( 14,0 );
-    displayStringWrite( "'C" );
+    char actualLoadString[4] = "";
+
+    sprintf(actualLoadString, "%.0f", get_food_load());
+    displayCharPositionWrite ( 5,1 );
+    displayStringWrite( actualLoadString );
+    displayCharPositionWrite ( 9,1 );
+    displayStringWrite( "g" );
 
     displayCharPositionWrite ( 4,1 );
 

@@ -17,6 +17,9 @@ typedef enum {
 void timeForFoodInit();
 void timeForFoodUpdate();
 
+int get_times_q();
+int get_time_for_food( int index );
+
 //=====[#include guards - end]=================================================
 
 #endif // _TIME_FOR_FOOD_H_

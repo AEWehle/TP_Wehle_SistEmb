@@ -36,7 +36,7 @@ void foodStorageUpdate()
 
 }
 
-bool underStorageDetectorStateRead()
+bool getUnderStorageDetectorState()
 {
     return underStorageDetectorState;
 }

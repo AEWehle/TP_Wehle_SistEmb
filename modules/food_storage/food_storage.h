@@ -12,7 +12,7 @@
 void foodStorageInit();
 void foodStorageUpdate();
 
-bool underStorageDetectorStateRead();
+bool getUnderStorageDetectorState();
 
 
 //=====[#include guards - end]=================================================

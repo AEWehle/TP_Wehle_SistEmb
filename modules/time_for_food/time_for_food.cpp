@@ -22,8 +22,11 @@
 //=====[Declaration and initialization of public global variables]=============
 
 const int MAX_TIMES_DAY = 50;
-static int timesIndex = 1;
-static char times_for_food[MAX_TIMES_DAY][6] = {"08:00", "20:00"};
+static int timesIndex = 2;
+static int times_for_food[MAX_TIMES_DAY] = { 48 , 120 }; // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
+// hora =  (número // 6), div entera de 6
+// minutos = (número % 6) *60, el resto*60
+
 
 //=====[Declaration and initialization of private global variables]============
 
@@ -32,15 +35,15 @@ const float FOOD_LOAD_DEFAULT = 100;//g
 
 //=====[Declarations (prototypes) of private functions]========================
 
-// devuelve true si la hora y minuto son iguales
-bool its_time( char* actual_time, char* a_time)
+// devuelve true si actual time es un time_for_food
+bool its_time( char* actual_time )
 {
-    for ( int i = 0 ; i < 5 ; i++ )
-    {
-        if ( actual_time[i + 11] != a_time[i] ) 
-            return false;
+    int time_numer = atoi( actual_time[11] ) * 10 + atoi( actual_time[12] ) + atoi( actual_time[14] ) * 10 + atoi( actual_time[15] ); // (hora*6 + minuto)
+    for( int i = 0; i < timesIndex ; i++){
+        if ( time_numer == times_for_food[i] ) 
+            return true;
     }
-    return true;
+    return false;
 }
 
 

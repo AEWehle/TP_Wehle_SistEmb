@@ -26,7 +26,7 @@ HX711 balanza(DOUT, CLK);
 static bool chargingState = OFF;
 static bool foodIncreasedDetected      = OFF;
 static bool foodDecreasedDetected      = OFF;
-static float food_load_required = 100;  // lo establce el usuario
+static float food_load_required = 100;  // lo establece el usuario
 static float food_load = 0; // en gramos
 static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
 static int time_count_bowl = 0;
@@ -83,6 +83,7 @@ float get_food_load() {
 
 void bowlUpdate()
 {
+    if( get)
     if( (get_food_load() > food_load_required) && chargingState ){
         motorDeactivation();
         chargingState = OFF;

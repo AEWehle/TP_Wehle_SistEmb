@@ -49,6 +49,11 @@ void time_for_food_init()
     set_max_food_load( FOOD_LOAD_DEFAULT );
 }
 
+loop_mode_t get_food_mode()
+{    
+    return food_mode;
+}
+
 int get_times_q(){
     return timesIndex;
 }

@@ -228,6 +228,12 @@ void displayInit( displayType_t type, displayConnection_t connection )
     delay( 1 );  
 }
 
+void displayPositionStringWrite( uint8_t charPositionX, uint8_t charPositionY, const char * str )
+{
+    displayCharPositionWrite (  charPositionX, charPositionY );
+    displayStringWrite( str );
+}
+
 void displayCharPositionWrite( uint8_t charPositionX, uint8_t charPositionY )
 {    
     if( display.type == DISPLAY_TYPE_LCD_HD44780 ) {

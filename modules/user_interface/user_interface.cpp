@@ -52,6 +52,8 @@ static int displayRefreshTimeMs = DISPLAY_REFRESH_TIME_REPORT_MS;
 
 //=====[Declarations (prototypes) of private functions]========================
 
+void set_cursor( int user_position );
+
 static void userInterfaceDisplayInit();
 static void userInterfaceDisplayUpdate();
 
@@ -72,16 +74,9 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate();
 
 static void userInterfaceDisplayBowlTareStateInit();
 static void userInterfaceDisplayBowlTareStateUpdate();
-// static void gateOpenButtonCallback();
-// static void gateCloseButtonCallback();
 
 //=====[Implementations of public functions]===================================
 
-
-void set_cursor( int user_position ){
-    displayCharPositionWrite ( 0, displayUserPosition )
-    displayStringWrite( "*" );
-}
 
 void userInterfaceInit()
 {
@@ -427,5 +422,10 @@ static void userInterfaceDisplayBowlTareStateUpdate()
 
 }
 
+
+void set_cursor( int user_position ){
+    displayCharPositionWrite ( 0, displayUserPosition )
+    displayStringWrite( "*" );
+}
 
 

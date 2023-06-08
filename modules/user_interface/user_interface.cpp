@@ -77,6 +77,12 @@ static void userInterfaceDisplayBowlTareStateUpdate();
 
 //=====[Implementations of public functions]===================================
 
+
+void set_cursor( int user_position ){
+    displayCharPositionWrite ( 0, displayUserPosition )
+    displayStringWrite( "*" );
+}
+
 void userInterfaceInit()
 {
     userInterfaceDisplayInit();
@@ -92,6 +98,8 @@ static void userInterfaceDisplayReportStateInit()
     displayState = DISPLAY_REPORT_STATE;
     displayRefreshTimeMs = DISPLAY_REFRESH_TIME_REPORT_MS;
 
+    displayUserPosition =0;
+    
     displayModeWrite( DISPLAY_MODE_CHAR );
 
     displayClear();
@@ -108,6 +116,11 @@ static void userInterfaceDisplayReportStateInit()
  
 static void userInterfaceDisplayReportStateUpdate()
 {
+    if( scroll_pressed() ){
+        displayState = DISPLAY_AJUSTES_STATE;
+        return;
+    }
+
     // date and time
     char lineString[21] = "";
     time_t rawtime;
@@ -155,7 +168,11 @@ static void userInterfaceDisplayInit()
 static void userInterfaceDisplayUpdate()
 {
     static int accumulatedDisplayTime = 0;
-
+        
+    if ( scroll_up() )
+        userPositionDisplay++;
+    else if( scroll_down() )
+        userPositionDisplay--;
 
     if( accumulatedDisplayTime >=
         displayRefreshTimeMs ) { 
@@ -197,7 +214,9 @@ static void userInterfaceDisplayAjustesStateInit()
     displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
 
     displayClear();
-
+   
+    displayUserPosition =0;
+    
     char ajustesString[21] = "";
     displayCharPositionWrite ( 0,0 );
     sprintf(ajustesString, "Ajustes");
@@ -221,31 +240,54 @@ static void userInterfaceDisplayAjustesStateInit()
 
 static void userInterfaceDisplayAjustesStateUpdate()
 {
+if( scroll_pressed() ){
+        displayState = displayUserPosition;
+        return;
+    }
+if( displayUserPosition > 5) 
+    displayUserPosition = 5;
+else if( displayUserPosition < 1)
+    displayUserPosition = 1;
+
+switch( displayUserPosition )
+{
+    case 1: case 2: case 3: case 4:
     char ajustesString[21] = "";
-    displayCharPositionWrite ( 0,0 - displayUserPosition );
+    displayCharPositionWrite ( 0,0 );
     sprintf(ajustesString, "Ajustes");
     displayStringWrite( ajustesString );
-
-    displayCharPositionWrite ( 1,1 - displayUserPosition);
+   
+    displayCharPositionWrite ( 1,1 );
     sprintf(ajustesString, "Cambiar fecha/hora");
     displayStringWrite( ajustesString );
     
-    displayCharPositionWrite ( 1,2 - displayUserPosition);
+    displayCharPositionWrite ( 1,2 );
     sprintf(ajustesString, "Liberar alimento");
     displayStringWrite( ajustesString );
     
-    displayCharPositionWrite ( 1,3 - displayUserPosition);
+    displayCharPositionWrite ( 1,3 );
     sprintf(ajustesString, "Programar horario");
     displayStringWrite( ajustesString );
+    
+    set_cursor( displayUserPosition );
+    
+    break;
 
-    displayCharPositionWrite ( 1,4 - displayUserPosition);
+    case 5: case 6: 
+    displayCharPositionWrite ( 1,0 );
     sprintf(ajustesString, "Tara de bowl");
     displayStringWrite( ajustesString );
 
-    displayCharPositionWrite ( 1,5 - displayUserPosition);
+    displayCharPositionWrite ( 1,2 );
     sprintf(ajustesString, "Alarma bajo alm.OFF");
     displayStringWrite( ajustesString );
+
+    set_cursor( displayUserPosition -4);
+    break;
 }
+}
+
+
 
 // DISPLAY en cambiar fecha y hora
 static void userInterfaceDisplaySetDateTimeStateInit()
@@ -254,6 +296,8 @@ static void userInterfaceDisplaySetDateTimeStateInit()
     displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
     displayClear();
 
+    displayUserPosition =0;
+    
     char setDateTimeString[21] = "";
     displayCharPositionWrite ( 0,0 );
     sprintf(setDateTimeString, "Cambiar fecha/hora");
@@ -283,6 +327,8 @@ static void userInterfaceDisplayReleaseFoodStateInit()
     displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
     displayClear();
 
+    displayUserPosition =0;
+    
     char releaseFoodString[21] = "";
     displayCharPositionWrite ( 0,0 );
     sprintf(releaseFoodString, "Liberar alimento");
@@ -356,6 +402,8 @@ static void userInterfaceDisplayBowlTareStateInit()
     displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
     displayClear();
 
+    displayUserPosition =0;
+    
     char tareBowlString[21] = "";
     displayCharPositionWrite ( 0,0 );
     sprintf(tareBowlString, "Tara del bowl");

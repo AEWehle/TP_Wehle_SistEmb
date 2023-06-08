@@ -1,5 +1,6 @@
 //=====[Libraries]=============================================================
 
+
 #include "mbed.h"
 #include "arm_book_lib.h"
 
@@ -10,26 +11,31 @@
 #include "display.h"
 #include "motor.h"
 #include "bowl.h"
+#include "food_storage.h"
+#include "time_for_food.h"
 
 //=====[Declaration of private defines]========================================
 
 #define DISPLAY_REFRESH_TIME_REPORT_MS 1000
-#define DISPLAY_REFRESH_TIME_ALARM_MS 300
+#define DISPLAY_FAST_REFRESH_TIME_MS 100 // para cuando tiene que cambiar según acciones del usuario
 
 //=====[Declaration of private data types]=====================================
 
 typedef enum {
-    DISPLAY_ALARM_STATE,
-    DISPLAY_REPORT_STATE
+    DISPLAY_REPORT_STATE,
+    DISPLAY_AJUSTES_STATE,
+    DISPLAY_AJUSTES_SET_DATE_TIME_STATE,
+    DISPLAY_AJUSTES_RELEASE_FOOD_STATE,
+    DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE,
+    DISPLAY_AJUSTES_BOWL_TARE_STATE
 } displayState_t;
-
 //=====[Declaration and initialization of public global objects]===============
 
 // InterruptIn gateOpenButton(PF_9);
-// InterruptIn gateCloseButton(PF_8);
-
-// DigitalOut incorrectCodeLed(LED3);
-// DigitalOut systemBlockedLed(LED2);
+// InterruptIn gateCloseButton(PF_8);// DigitalOut incorrectCodeLed(LED3);
+DigitalIn encoderA(PB_7);
+DigitalIn encoderB(PB_8);
+DigitalIn encoderSW(PB_9);
 
 //=====[Declaration of external public global variables]=======================
 
@@ -40,29 +46,32 @@ typedef enum {
 //=====[Declaration and initialization of private global variables]============
 
 static displayState_t displayState = DISPLAY_REPORT_STATE;
-// static int displayFireAlarmGraphicSequence = 0;
+static int displayUserPosition = 0;
 // static int displayIntruderAlarmGraphicSequence = 0;
 static int displayRefreshTimeMs = DISPLAY_REFRESH_TIME_REPORT_MS;
 
-// static bool incorrectCodeState = OFF;
-// static bool systemBlockedState = OFF;
-
-// static bool codeComplete = false;
-// static int numberOfCodeChars = 0;
-
 //=====[Declarations (prototypes) of private functions]========================
-
-// static void userInterfaceMatrixKeypadUpdate();
-// static void incorrectCodeIndicatorUpdate();
-// static void systemBlockedIndicatorUpdate();
 
 static void userInterfaceDisplayInit();
 static void userInterfaceDisplayUpdate();
+
 static void userInterfaceDisplayReportStateInit();
 static void userInterfaceDisplayReportStateUpdate();
-// static void userInterfaceDisplayAlarmStateInit();
-// static void userInterfaceDisplayAlarmStateUpdate();
 
+static void userInterfaceDisplayAjustesStateInit();
+static void userInterfaceDisplayAjustesStateUpdate();
+
+static void userInterfaceDisplaySetDateTimeStateInit();
+static void userInterfaceDisplaySetDateTimeStateUpdate();
+
+static void userInterfaceDisplayReleaseFoodStateInit();
+static void userInterfaceDisplayReleaseFoodStateUpdate();
+
+static void userInterfaceDisplaySetFoodTimesStateInit();
+static void userInterfaceDisplaySetFoodTimesStateUpdate();
+
+static void userInterfaceDisplayBowlTareStateInit();
+static void userInterfaceDisplayBowlTareStateUpdate();
 // static void gateOpenButtonCallback();
 // static void gateCloseButtonCallback();
 
@@ -70,115 +79,13 @@ static void userInterfaceDisplayReportStateUpdate();
 
 void userInterfaceInit()
 {
-    // gateOpenButton.mode(PullUp);
-    // gateCloseButton.mode(PullUp);
-
-    // gateOpenButton.fall(&gateOpenButtonCallback);
-    // gateCloseButton.fall(&gateCloseButtonCallback);
-    
-    // incorrectCodeLed = OFF;
-    // systemBlockedLed = OFF;
-    // matrixKeypadInit( SYSTEM_TIME_INCREMENT_MS );
     userInterfaceDisplayInit();
-    
-    // lightLevelControlInit();
 }
 
 void userInterfaceUpdate()
 {
-    // userInterfaceMatrixKeypadUpdate();
-    // incorrectCodeIndicatorUpdate();
-    // systemBlockedIndicatorUpdate();
     userInterfaceDisplayUpdate();
-    // lightLevelControlUpdate();
-}
-
-// bool incorrectCodeStateRead()
-// {
-//     return incorrectCodeState;
-// }
-
-// void incorrectCodeStateWrite( bool state )
-// {
-//     incorrectCodeState = state;
-// }
-
-// bool systemBlockedStateRead()
-// {
-//     return systemBlockedState;
-// }
-
-// void systemBlockedStateWrite( bool state )
-// {
-//     systemBlockedState = state;
-// }
-
-// bool userInterfaceCodeCompleteRead()
-// {
-//     return codeComplete;
-// }
-
-// void userInterfaceCodeCompleteWrite( bool state )
-// {
-//     codeComplete = state;
-// }
-
-//=====[Implementations of private functions]==================================
-
-// static void userInterfaceMatrixKeypadUpdate()
-// {
-//     static int numberOfHashKeyReleased = 0;
-//     char keyReleased = matrixKeypadUpdate();
-
-//     if( keyReleased != '\0' ) {
-
-//         if( alarmStateRead() && !systemBlockedStateRead() ) {
-//             if( !incorrectCodeStateRead() ) {
-//                 codeSequenceFromUserInterface[numberOfCodeChars] = keyReleased;
-//                 numberOfCodeChars++;
-//                 if ( numberOfCodeChars >= CODE_NUMBER_OF_KEYS ) {
-//                     codeComplete = true;
-//                     numberOfCodeChars = 0;
-//                 }
-//             } else {
-//                 if( keyReleased == '#' ) {
-//                     numberOfHashKeyReleased++;
-//                     if( numberOfHashKeyReleased >= 2 ) {
-//                         numberOfHashKeyReleased = 0;
-//                         numberOfCodeChars = 0;
-//                         codeComplete = false;
-//                         incorrectCodeState = OFF;
-//                     }
-//                 }
-//             }
-//         } else if ( !systemBlockedStateRead() ) {
-//             if( keyReleased == 'A' ) {
-//                 motionSensorActivate();
-//             }
-//             if( keyReleased == 'B' ) {
-//                 motionSensorDeactivate();
-//             }
-//             if( keyReleased == '1' ) {
-//                 lightSystemBrightnessChangeRGBFactor( RGB_LED_RED, true );
-//             }
-//             if( keyReleased == '2' ) {
-//                 lightSystemBrightnessChangeRGBFactor( RGB_LED_GREEN, true );
-//             }
-//             if( keyReleased == '3' ) {
-//                 lightSystemBrightnessChangeRGBFactor( RGB_LED_BLUE, true );
-//             }
-//             if( keyReleased == '4' ) {
-//                 lightSystemBrightnessChangeRGBFactor( RGB_LED_RED, false );
-//             }
-//             if( keyReleased == '5' ) {
-//                 lightSystemBrightnessChangeRGBFactor( RGB_LED_GREEN, false );
-//             }
-//             if( keyReleased == '6' ) {
-//                 lightSystemBrightnessChangeRGBFactor( RGB_LED_BLUE, false );
-//             }
-//         }
-//     }
-// }
+} 
 
 static void userInterfaceDisplayReportStateInit()
 {
@@ -194,156 +101,283 @@ static void userInterfaceDisplayReportStateInit()
     displayCharPositionWrite ( 0,1 );
     displayStringWrite( "Peso:         |  :  " );
     displayCharPositionWrite ( 0,2 );
-    displayStringWrite( "Alm.       :  |  :  " );
+    displayStringWrite( "Alm.          |  :  " );
     displayCharPositionWrite ( 0,3 );
-    displayStringWrite( "  Ajustes  :  |  :  " );
+    displayStringWrite( " *Ajustes     |  :  " );
 }
-
+ 
 static void userInterfaceDisplayReportStateUpdate()
 {
-    char actualTimeString[3] = "";
+    // date and time
+    char lineString[21] = "";
     time_t rawtime;
     struct tm * timeinfo;
     time (&rawtime);
     timeinfo = localtime (&rawtime);
     displayCharPositionWrite ( 0,0 );
-    sprintf(actualTimeString, "%.0f", get_food_load());
-    displayStringWrite( actualTimeString );
-    timeinfo->tm_mon,
-    timeinfo->tm_mday, timeinfo->tm_hour,
-    timeinfo->tm_min, timeinfo->tm_sec,
-    1900 + timeinfo->tm_year);
+    sprintf(lineString, "%d/%d/%d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 + timeinfo->tm_year);
+    displayCharPositionWrite ( 9,0 );
+    sprintf(lineString, "%d:&d", timeinfo->tm_hour, timeinfo->tm_min);
+    displayStringWrite( lineString );   
 
-    char actualLoadString[4] = "";
-
-    sprintf(actualLoadString, "%.0f", get_food_load());
+    // food load
+    sprintf(lineString, " %.0f g", get_food_load());
     displayCharPositionWrite ( 5,1 );
-    displayStringWrite( actualLoadString );
-    displayCharPositionWrite ( 9,1 );
-    displayStringWrite( "g" );
-
-    displayCharPositionWrite ( 4,1 );
-
-    // if ( gasDetectorStateRead() ) {
-    //     displayStringWrite( "Detected    " );
-    // } else {
-    //     displayStringWrite( "Not Detected" );
-    // }
-    displayCharPositionWrite ( 6,2 );
-    displayStringWrite( "OFF" );
+    displayStringWrite( lineString );
+ 
+//  food storage state
+    displayCharPositionWrite ( 4,2 );
+    if ( getUnderStorageDetectorState() )
+        sprintf(lineString, "BAJO");
+    else{
+        sprintf(lineString, "OK  ");}   
+    displayStringWrite( lineString );
+ 
+//  times for food
+    int qtimes = get_times_q();
+    int food_time;
+    for (int i = 0 ; i < qtimes && i < 4 ; i++){
+        food_time = get_time_for_food( i );
+        sprintf(lineString, "%d:%d", (int) food_time/6, food_time % 6 *60); 
+        displayCharPositionWrite ( 15,i );
+        displayStringWrite( lineString );
+    }
 }
-
-// static void userInterfaceDisplayAlarmStateInit()
-// {
-//     displayState = DISPLAY_ALARM_STATE;
-//     displayRefreshTimeMs = DISPLAY_REFRESH_TIME_ALARM_MS;
-
-//     displayClear();
-
-//     displayModeWrite( DISPLAY_MODE_GRAPHIC );
-
-//     displayFireAlarmGraphicSequence = 0;
-// }
-
-// static void userInterfaceDisplayAlarmStateUpdate()
-// {
-//     if ( ( gasDetectedRead() ) || ( overTemperatureDetectedRead() ) ) {
-//         switch( displayFireAlarmGraphicSequence ) {
-//         case 0:
-//             displayBitmapWrite( GLCD_fire_alarm[0] );
-//             displayFireAlarmGraphicSequence++;
-//             break;
-//         case 1:
-//             displayBitmapWrite( GLCD_fire_alarm[1] );
-//             displayFireAlarmGraphicSequence++;
-//             break;
-//         case 2:
-//             displayBitmapWrite( GLCD_fire_alarm[2] );
-//             displayFireAlarmGraphicSequence++;
-//             break;
-//         case 3:
-//             displayBitmapWrite( GLCD_fire_alarm[3] );
-//             displayFireAlarmGraphicSequence = 0;
-//             break;
-//         default:
-//             displayBitmapWrite( GLCD_ClearScreen );
-//             displayFireAlarmGraphicSequence = 0;
-//             break;
-//         }
-//     } else if ( intruderDetectedRead() ) {
-//         switch( displayIntruderAlarmGraphicSequence ) {
-//         case 0:
-//             displayBitmapWrite( GLCD_intruder_alarm );
-//             displayIntruderAlarmGraphicSequence++;
-//             break;
-//         case 1:
-//         default:
-//             displayBitmapWrite( GLCD_ClearScreen );
-//             displayIntruderAlarmGraphicSequence = 0;
-//             break;
-//         }
-//     }
-// }
 
 static void userInterfaceDisplayInit()
 {
-    displayInit( DISPLAY_TYPE_GLCD_ST7920, DISPLAY_CONNECTION_SPI );
+    encoderSW.mode(PullUp);
+    displayInit( DISPLAY_TYPE_LCD_HD44780, DISPLAY_CONNECTION_GPIO_4BITS );
     userInterfaceDisplayReportStateInit();
 }
+ 
 
 static void userInterfaceDisplayUpdate()
 {
     static int accumulatedDisplayTime = 0;
 
+
     if( accumulatedDisplayTime >=
-        displayRefreshTimeMs ) {
-
-        accumulatedDisplayTime = 0;
-
+        displayRefreshTimeMs ) { 
+        accumulatedDisplayTime = 0; 
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
-            userInterfaceDisplayReportStateUpdate();
-
-            // if ( alarmStateRead() ) {
-            //     userInterfaceDisplayAlarmStateInit();
-            // }
+             userInterfaceDisplayReportStateUpdate();
             break;
-
-        // case DISPLAY_ALARM_STATE:
-        //     userInterfaceDisplayAlarmStateUpdate();
-
-        //     if ( !alarmStateRead() ) {
-        //         userInterfaceDisplayReportStateInit();
-        //     }
-        //     break;
+        case DISPLAY_AJUSTES_STATE:
+            userInterfaceDisplayAjustesStateUpdate();
+            break;
+        case DISPLAY_AJUSTES_SET_DATE_TIME_STATE:
+            userInterfaceDisplaySetDateTimeStateUpdate();
+            break;
+        case DISPLAY_AJUSTES_RELEASE_FOOD_STATE:
+            userInterfaceDisplayReleaseFoodStateUpdate();
+            break;
+        case DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE:
+            userInterfaceDisplaySetFoodTimesStateUpdate();
+            break;
+        case DISPLAY_AJUSTES_BOWL_TARE_STATE:
+            userInterfaceDisplayBowlTareStateUpdate();
+            break;
 
         default:
             userInterfaceDisplayReportStateInit();
             break;
         }
-
     } else {
         accumulatedDisplayTime =
             accumulatedDisplayTime + SYSTEM_TIME_INCREMENT_MS;
     }
 }
 
-// static void incorrectCodeIndicatorUpdate()
-// {
-//     incorrectCodeLed = incorrectCodeStateRead();
-// }
+// DISPLAY EN AJUSTES
+static void userInterfaceDisplayAjustesStateInit()
+{
+    displayState = DISPLAY_AJUSTES_STATE;
+    displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
 
-// static void systemBlockedIndicatorUpdate()
-// {
-//     systemBlockedLed = systemBlockedState;
-// }
+    displayClear();
 
-// static void gateOpenButtonCallback()
-// {
-//     gateOpen();
-// }
+    char ajustesString[21] = "";
+    displayCharPositionWrite ( 0,0 );
+    sprintf(ajustesString, "Ajustes");
+    displayStringWrite( ajustesString );
 
-// static void gateCloseButtonCallback()
-// {
-//     gateClose();
-// }
+    displayCharPositionWrite ( 0,1 );
+    sprintf(ajustesString, "*Cambiar fecha/hora");
+    displayStringWrite( ajustesString );
+    
+    displayCharPositionWrite ( 0,2 );
+    sprintf(ajustesString, " Liberar alimento");
+    displayStringWrite( ajustesString );
+    
+    displayCharPositionWrite ( 0,3 );
+    sprintf(ajustesString, " Programar horario");
+    displayStringWrite( ajustesString );
+    
+    // sprintf(ajustesString, " Tara de bowl       ");
+    // sprintf(ajustesString, " Alarma bajo alm.OFF");
+}
+
+static void userInterfaceDisplayAjustesStateUpdate()
+{
+    char ajustesString[21] = "";
+    displayCharPositionWrite ( 0,0 - displayUserPosition );
+    sprintf(ajustesString, "Ajustes");
+    displayStringWrite( ajustesString );
+
+    displayCharPositionWrite ( 1,1 - displayUserPosition);
+    sprintf(ajustesString, "Cambiar fecha/hora");
+    displayStringWrite( ajustesString );
+    
+    displayCharPositionWrite ( 1,2 - displayUserPosition);
+    sprintf(ajustesString, "Liberar alimento");
+    displayStringWrite( ajustesString );
+    
+    displayCharPositionWrite ( 1,3 - displayUserPosition);
+    sprintf(ajustesString, "Programar horario");
+    displayStringWrite( ajustesString );
+
+    displayCharPositionWrite ( 1,4 - displayUserPosition);
+    sprintf(ajustesString, "Tara de bowl");
+    displayStringWrite( ajustesString );
+
+    displayCharPositionWrite ( 1,5 - displayUserPosition);
+    sprintf(ajustesString, "Alarma bajo alm.OFF");
+    displayStringWrite( ajustesString );
+}
+
+// DISPLAY en cambiar fecha y hora
+static void userInterfaceDisplaySetDateTimeStateInit()
+{
+    displayState = DISPLAY_AJUSTES_SET_DATE_TIME_STATE;
+    displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
+    displayClear();
+
+    char setDateTimeString[21] = "";
+    displayCharPositionWrite ( 0,0 );
+    sprintf(setDateTimeString, "Cambiar fecha/hora");
+    displayStringWrite( setDateTimeString );
+
+    displayCharPositionWrite ( 1,1 );
+    sprintf(setDateTimeString, "Fecha    DD/MM/AAAA");
+    displayStringWrite( setDateTimeString );
+
+    displayCharPositionWrite ( 1,2 );
+    sprintf(setDateTimeString, "Hora     HH:MM");
+    displayStringWrite( setDateTimeString );
+
+    displayCharPositionWrite ( 14,3 );
+    sprintf(setDateTimeString, "Listo");
+    displayStringWrite( setDateTimeString );
+}
+static void userInterfaceDisplaySetDateTimeStateUpdate()
+{
+
+}
+
+// DISPLAY en liberar comida
+static void userInterfaceDisplayReleaseFoodStateInit()
+{
+    displayState = DISPLAY_AJUSTES_RELEASE_FOOD_STATE;
+    displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
+    displayClear();
+
+    char releaseFoodString[21] = "";
+    displayCharPositionWrite ( 0,0 );
+    sprintf(releaseFoodString, "Liberar alimento");
+    displayStringWrite( releaseFoodString );
+
+    displayCharPositionWrite ( 2,1 );
+    sprintf(releaseFoodString, "Gire la perilla");
+    displayStringWrite( releaseFoodString );
+
+    displayCharPositionWrite ( 0,1 );
+    sprintf(releaseFoodString, "Presione para salir");
+    displayStringWrite( releaseFoodString );
+}
+
+static void userInterfaceDisplayReleaseFoodStateUpdate()
+{
+
+}
+
+// DISPLAY en setear horarios
+static void userInterfaceDisplaySetFoodTimesStateInit()
+{
+    displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+    displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
+    displayClear();
+
+    char setFoodTimesString[21] = "";
+    displayCharPositionWrite ( 0,0 );
+    sprintf(setFoodTimesString, "Establecer horarios");
+    displayStringWrite( setFoodTimesString );
+
+    displayCharPositionWrite ( 1,1 );
+    sprintf(setFoodTimesString, "Liberar hasta:");
+    displayStringWrite( setFoodTimesString );
+
+    displayCharPositionWrite ( 1,2 );
+    sprintf(setFoodTimesString, "Liberar siempre");
+    displayStringWrite( setFoodTimesString );
+
+    displayCharPositionWrite ( 1,3 );
+    sprintf(setFoodTimesString, "Eliminar horario");
+    displayStringWrite( setFoodTimesString );
+
+    displayCharPositionWrite ( 1,4 );
+    sprintf(setFoodTimesString, "Modificar horario");
+    displayStringWrite( setFoodTimesString );
+
+    displayCharPositionWrite ( 1,5 );
+    sprintf(setFoodTimesString, "Aregar horario++");
+    displayStringWrite( setFoodTimesString );
+
+    int qtimes = get_times_q();
+    int food_time;
+    for (int i = 0 ; i < qtimes ; i++){
+        food_time = get_time_for_food( i );
+        sprintf(setFoodTimesString, "%d:%d", (int) food_time/6, food_time % 6 *60); 
+        displayCharPositionWrite ( 1,i+6 );
+        displayStringWrite( setFoodTimesString );
+    }
+}
+
+static void userInterfaceDisplaySetFoodTimesStateUpdate()
+{
+
+}
+
+// DISPLAY en establecer tara del bowl
+static void userInterfaceDisplayBowlTareStateInit()
+{
+    displayState = DISPLAY_AJUSTES_BOWL_TARE_STATE;
+    displayRefreshTimeMs = DISPLAY_FAST_REFRESH_TIME_MS;
+    displayClear();
+
+    char tareBowlString[21] = "";
+    displayCharPositionWrite ( 0,0 );
+    sprintf(tareBowlString, "Tara del bowl");
+    displayStringWrite( tareBowlString );
+
+    displayCharPositionWrite ( 2,1 );
+    sprintf(tareBowlString, "Coloque vacío el ¿");
+    displayStringWrite( tareBowlString );
+
+    displayCharPositionWrite ( 1,2 );
+    sprintf(tareBowlString, "bowl de su mascota");
+    displayStringWrite( tareBowlString );
+
+    displayCharPositionWrite ( 4,3 );
+    sprintf(tareBowlString, "*Listo");
+    displayStringWrite( tareBowlString );
+}
+
+static void userInterfaceDisplayBowlTareStateUpdate()
+{
+
+}
+
+
+

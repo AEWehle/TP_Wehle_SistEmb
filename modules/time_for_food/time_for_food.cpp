@@ -50,6 +50,10 @@ void time_for_food_init()
     //set_max_food_load( FOOD_LOAD_DEFAULT );
 }
 
+void set_max_food_load( float new_food_load ){
+    food_load_required = new_food_load;
+}
+
 loop_mode_t get_food_mode()
 {    
     return food_mode;
@@ -81,8 +85,8 @@ void time_for_food_update()
     char* actual_time = dateAndTimeRead(); //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
     if( its_time( actual_time ) ){
         if ( food_mode == OPEN )
-        bowl_charge( 0 );
-        else bowl_charge( max_food_load );
+        bowl_charge( food_load_required );
+        else bowl_charge( food_load_required - get_food_load() );
     }
 }
 

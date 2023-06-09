@@ -54,6 +54,11 @@ void set_max_food_load( float new_food_load ){
     food_load_required = new_food_load;
 }
 
+void change2_open_mode(){
+    food_mode = OPEN;}
+void change2_close_mode(){
+    food_mode = CLOSE;}
+
 loop_mode_t get_food_mode()
 {    
     return food_mode;

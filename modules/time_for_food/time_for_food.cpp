@@ -35,6 +35,7 @@ static food_time_t times_for_food[MAX_TIMES_DAY] = { 48 , 120 };
 
 loop_mode_t food_mode;
 const float FOOD_LOAD_DEFAULT = 100;//g
+static float max_food_load = FOOD_LOAD_DEFAULT;
 
 //=====[Declarations (prototypes) of private functions]========================
 
@@ -46,7 +47,7 @@ int char2int( char the_char );
 void time_for_food_init()
 {    
     food_mode = CLOSED; // Por default de entrega comida hasta que haya MAX_FOOD_LOAD en el bowl a las 8hs y a las 20hs
-    set_max_food_load( FOOD_LOAD_DEFAULT );
+    //set_max_food_load( FOOD_LOAD_DEFAULT );
 }
 
 loop_mode_t get_food_mode()
@@ -79,7 +80,9 @@ void time_for_food_update()
 {
     char* actual_time = dateAndTimeRead(); //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
     if( its_time( actual_time ) ){
-        bowl_charge();
+        if ( food_mode == OPEN )
+        bowl_charge( 0 );
+        else bowl_charge( max_food_load );
     }
 }
 

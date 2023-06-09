@@ -71,9 +71,9 @@ void bowlInit()
     bowl_tare();
 }
 
-void bowl_charge( float added_food ){
+void bowl_charge( float food_to_add ){
     motorActivation();
-    food_load_required = get_food_load() + added_food;
+    food_load_required = get_food_load() + food_to_add;
     chargingState = ON;
 }
 

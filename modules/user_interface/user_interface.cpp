@@ -13,6 +13,8 @@
 #include "bowl.h"
 #include "food_storage.h"
 #include "time_for_food.h"
+#include "scroll.h"
+
 
 //=====[Declaration of private defines]========================================
 
@@ -70,7 +72,9 @@ bool alarmLowStorageActivation = true;
 
 //=====[Declarations (prototypes) of private functions]========================
 
-void set_cursor( int user_position );
+// char* strcat( char* str , char* strcat );
+
+void set_user_cursor( int user_position );
 
 static void userInterfaceDisplayInit();
 static void userInterfaceDisplayUpdate();
@@ -83,6 +87,9 @@ static void userInterfaceDisplayAjustesStateUpdate();
 
 static void userInterfaceDisplaySetDateTimeStateInit();
 static void userInterfaceDisplaySetDateTimeStateUpdate();
+static void displaySetDateState();
+static void displaySetTimeState();
+
 
 static void userInterfaceDisplayReleaseFoodStateInit();
 static void userInterfaceDisplayReleaseFoodStateUpdate();
@@ -101,6 +108,7 @@ static void userInterfaceDisplayAlarmStorageStateUpdate();
 void userInterfaceInit()
 {
     userInterfaceDisplayInit();
+    scrollInit();
 }
 
 void userInterfaceUpdate()
@@ -110,7 +118,6 @@ void userInterfaceUpdate()
 
 static void userInterfaceDisplayInit()
 {
-    encoderSW.mode(PullUp);
     displayInit( DISPLAY_TYPE_LCD_HD44780, DISPLAY_CONNECTION_GPIO_4BITS );
     userInterfaceDisplayReportStateInit();
 }
@@ -120,9 +127,9 @@ static void userInterfaceDisplayUpdate()
 {
     static int accumulatedDisplayTime = 0;
         
-    if ( scroll_up() )
+    if ( scrollUp() )
         displayUserPosition++;
-    else if( scroll_down() )
+    else if( scrollDown() )
         displayUserPosition--;
 
     if( accumulatedDisplayTime >=
@@ -150,7 +157,15 @@ static void userInterfaceDisplayUpdate()
         case DISPLAY_AJUSTES_ALARM_STORAGE_STATE:
             userInterfaceDisplayAlarmStorageStateUpdate();
             break;
-
+        case DISPLAY_AJUSTES_SET_ACTUAL_DATE_STATE:
+            displaySetTimeState();
+            break;
+        case DISPLAY_AJUSTES_SET_ACTUAL_TIME_STATE:
+            displaySetDateState();
+            break;
+        case DISPLAY_MOVING_MOTOR_STATE:
+            // userInterfaceDisplayAlarmStorageStateUpdate();
+            break;
         default:
             userInterfaceDisplayReportStateInit();
             break;
@@ -178,12 +193,12 @@ static void userInterfaceDisplayReportStateInit()
     displayPositionStringWrite ( 0,0 , "  /  /     :  |  :  " );
     displayPositionStringWrite ( 0,1 , "Peso:         |  :  " );
     displayPositionStringWrite ( 0,2 , "Alm.          |  :  " );
-    displayPositionStringWrite ( 0,3 , " *Ajustes     |  :  " );
+    displayPositionStringWrite ( 0,3 , "  *Ajustes    |  :  " );
 }
  
 static void userInterfaceDisplayReportStateUpdate()
 {
-    if( scroll_pressed() ){
+    if(  scrollPressed() ){
         displayState = DISPLAY_AJUSTES_STATE;
         return;
     }
@@ -239,14 +254,15 @@ static void userInterfaceDisplayAjustesStateUpdate()
     else if( displayUserPosition < 1)
         displayUserPosition = 1;
 
-    if( scroll_pressed() ){
+    if(  scrollPressed() ){
             displayState =  ( displayState_t ) displayUserPosition;
             return;
         }
     
-    switch( displayUserPosition ){
-        case 1: case 2: case 3: case 4:
-            char ajustesString[21] = "";
+        char ajustesString[21] = "";
+        switch( displayUserPosition )
+        {
+        case 1:case 2:case 3:case 4:
             sprintf(ajustesString, "Ajustes");
             displayPositionStringWrite ( 0,0 , ajustesString );
         
@@ -259,9 +275,9 @@ static void userInterfaceDisplayAjustesStateUpdate()
             sprintf(ajustesString, "Programar horario");
             displayPositionStringWrite ( 1,3 , ajustesString );
             
-            set_cursor( displayUserPosition );    
+            set_user_cursor( displayUserPosition );    
         break;
-        case 5:  case 6: 
+        case 5:case 6:
             displayClear();
             sprintf(ajustesString, "Tara de bowl");
             displayPositionStringWrite ( 1,0 , ajustesString );
@@ -273,7 +289,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
                 strcat(ajustesString, " OFF");
             displayPositionStringWrite ( 1,1 , ajustesString );
 
-            set_cursor( displayUserPosition - 5);
+            set_user_cursor( displayUserPosition - 5);
         break;
     }
 }
@@ -301,15 +317,19 @@ static void userInterfaceDisplaySetDateTimeStateInit()
     displayPositionStringWrite ( 14,3 , setDateTimeString );
 }
 
-void displaySetDate()
+static void displaySetDateState()
 {
-    
+    char setDateString[21] = "";
+    sprintf(setDateString, "*Fecha    DD/MM/AAAA");
+    displayPositionStringWrite ( 0,1 , setDateString );    
 }
 
 
-void displaySetTime()
+static void displaySetTimeState()
 {
-
+    char setTimeString[21] = "";
+    sprintf(setTimeString, "*Hora     HH:MM");
+    displayPositionStringWrite ( 0,2 , setTimeString );
 }
 
 static void userInterfaceDisplaySetDateTimeStateUpdate()
@@ -318,16 +338,24 @@ static void userInterfaceDisplaySetDateTimeStateUpdate()
         displayUserPosition = 3;
     else if( displayUserPosition < 1)
         displayUserPosition = 1;
-    set_cursor( displayUserPosition );
-    if( scroll_pressed() )
-    switch( displayUserPosition ){
-        case 1:
-            displaySetDate(); break;
-        case 2:
-            displaySetTime(); break;
-        case 3:
-            displayState = DISPLAY_AJUSTES_STATE; break;
+
+    set_user_cursor( displayUserPosition );
+
+    if(  scrollPressed() ){
+        if ( displayUserPosition == 3 ) displayState = DISPLAY_AJUSTES_STATE;
+        else{
+        displayState =  ( displayState_t ) ( displayUserPosition - 1 + (int) DISPLAY_AJUSTES_SET_ACTUAL_DATE_STATE );}
+        return;
     }
+    // if(  scrollPressed() )
+    // switch( displayUserPosition ){
+    //     case 1:
+    //         displaySetDate(); break;
+    //     case 2:
+    //         displaySetTime(); break;
+    //     case 3:
+    //         displayState = DISPLAY_AJUSTES_STATE; break;
+    // }
 }
 
 // DISPLAY en liberar comida
@@ -347,20 +375,27 @@ static void userInterfaceDisplayReleaseFoodStateInit()
     displayPositionStringWrite ( 2,1 , releaseFoodString );
 
     sprintf(releaseFoodString, "Presione para salir");
-    displayPositionStringWrite ( 0,1 , releaseFoodString );
+    displayPositionStringWrite ( 0,2 , releaseFoodString );
+
+    sprintf(releaseFoodString, "Peso: %.0f g", get_food_load() );
+    displayPositionStringWrite ( 3,3 , releaseFoodString );
 }
 
 static void userInterfaceDisplayReleaseFoodStateUpdate()
 {
-    if( scroll_pressed() )
+    if(  scrollPressed() )
     {
         displayState = DISPLAY_AJUSTES_STATE;
         motorDeactivation();
         return;
     }
-    if( scroll_down() || scroll_up() ) 
+    if( scrollDown() || scrollUp() ) 
         motorActivation();
     else motorDeactivation();
+
+    char releaseFoodString[21] = "";
+    sprintf(releaseFoodString, "Peso: %.0f g", get_food_load() );
+    displayPositionStringWrite ( 3,3 , releaseFoodString );
 }
 
 // DISPLAY en setear horarios
@@ -384,7 +419,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
     switch( displayUserPosition )
     {
         case 1:case 2:case 3:case 4:
-            set_cursor( displayUserPosition );
+            set_user_cursor( displayUserPosition );
             sprintf(setFoodTimesString, "Establecer horarios");
             displayPositionStringWrite ( 0,0 , setFoodTimesString );
 
@@ -447,7 +482,7 @@ static void userInterfaceDisplayAlarmStorageStateUpdate(){
     alarmLowStorageActivation = !alarmLowStorageActivation;
 }
 
-void set_cursor( int user_position ){
+void set_user_cursor( int user_position ){
     displayPositionStringWrite ( 0, user_position , "*" );
 }
 

@@ -29,7 +29,23 @@ typedef enum {
     DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE,
     DISPLAY_AJUSTES_BOWL_TARE_STATE,
     DISPLAY_AJUSTES_ALARM_STORAGE_STATE,
+    DISPLAY_AJUSTES_SET_ACTUAL_DATE_STATE,
+    DISPLAY_AJUSTES_SET_ACTUAL_TIME_STATE,
+    DISPLAY_MOVING_MOTOR_STATE
 } displayState_t;
+
+typedef enum {
+    DAY_STATE,
+    MONTH_STATE,
+    YEAR_STATE
+} setDateState_t;
+
+
+typedef enum {
+    HOUR_STATE,
+    MINUTE_STATE
+} setTimeState_t;
+
 //=====[Declaration and initialization of public global objects]===============
 
 // InterruptIn gateOpenButton(PF_9);

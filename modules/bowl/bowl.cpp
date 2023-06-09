@@ -114,9 +114,6 @@ float  get_last_minute_food_load(){
     return last_minute_food_load;
 }
 
-void set_food_load_required(int max_load){
-    food_load_required = max_load;
-}
 
 bool foodIncreasedStateRead()
 {

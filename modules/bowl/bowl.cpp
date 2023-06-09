@@ -83,7 +83,6 @@ float get_food_load() {
 
 void bowlUpdate()
 {
-    if( get)
     if( (get_food_load() > food_load_required) && chargingState ){
         motorDeactivation();
         chargingState = OFF;

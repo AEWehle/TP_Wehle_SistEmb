@@ -17,6 +17,8 @@ typedef enum {
 void timeForFoodInit();
 void timeForFoodUpdate();
 
+void set_max_food_load( float new_food_load );
+
 int get_times_q();
 int get_time_for_food( int index );
 

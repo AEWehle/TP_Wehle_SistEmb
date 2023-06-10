@@ -24,6 +24,7 @@ DigitalIn infrared(PE_12);
 
 void infraredSensorInit()
 {
+    infrared.mode(PullDown);
 }
 
 void infraredSensorUpdate()
@@ -32,7 +33,7 @@ void infraredSensorUpdate()
 
 bool infraredSensorRead()
 {
-    return infrared;
+    return infrared.read();
 }
 
 //=====[Implementations of private functions]==================================

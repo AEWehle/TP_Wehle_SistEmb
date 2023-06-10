@@ -32,7 +32,7 @@ static food_time_t times_for_food[MAX_TIMES_DAY] = { 48 , 120 };
 //=====[Declaration and initialization of private global variables]============
 
 bool charging = false;
-loop_mode_t food_mode;
+loop_mode_t food_mode = CLOSED;
 const float FOOD_LOAD_DEFAULT = 100;//g
 static float food_load_required = FOOD_LOAD_DEFAULT;
 
@@ -43,10 +43,9 @@ void sort_times();
 
 //=====[Implementations of public functions]===================================
 
-void time_for_food_init()
+void timeForFoodInit()
 {    
-    food_mode = CLOSED; // Por default de entrega comida hasta que haya food_load_required en el bowl a las 8hs y a las 20hs
-    //set_food_load_required( FOOD_LOAD_DEFAULT );
+    // Por default de entrega comida hasta que haya food_load_required en el bowl a las 8hs y a las 20hs
 }
 
 void set_food_load_required( float new_food_load ){
@@ -54,9 +53,12 @@ void set_food_load_required( float new_food_load ){
 }
 
 void change2_open_mode(){
-    food_mode = OPEN;}
+    food_mode = OPEN;
+}
+
 void change2_closed_mode(){
-    food_mode = CLOSED;}
+    food_mode = CLOSED;
+}
 
 loop_mode_t get_food_mode()
 {    
@@ -84,7 +86,7 @@ bool its_time( char* actual_time )
 }
 
 
-void time_for_food_update()
+void timeForFoodUpdate()
 {
     char* actual_time = dateAndTimeRead(); //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
     if( its_time( actual_time ))

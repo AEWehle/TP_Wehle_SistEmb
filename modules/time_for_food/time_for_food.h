@@ -11,7 +11,7 @@ typedef int food_time_t;
 typedef enum {
     CLOSED,
     OPEN
-} loop_mode_t;
+}loop_mode_t;
 
 //=====[Declaration of public data types]======================================
 

@@ -17,7 +17,7 @@
 
 void bowlInit();
 void bowlUpdate();
-void bowl_charge( int food_to_add );
+void bowl_charge( float food_to_add );
 float  get_food_load();
 float  get_last_minute_food_load();
 //void set_max_food_load(float max_food_load);

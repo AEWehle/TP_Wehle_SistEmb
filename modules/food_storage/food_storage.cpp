@@ -31,7 +31,6 @@ void foodStorageInit()
 void foodStorageUpdate()
 {
     infraredSensorUpdate();
-
     underStorageDetectorState = !infraredSensorRead();
 
 }

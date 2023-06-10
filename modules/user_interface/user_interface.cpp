@@ -53,7 +53,7 @@ typedef enum {
 
 // InterruptIn gateOpenButton(PF_9);
 // InterruptIn gateCloseButton(PF_8);// DigitalOut incorrectCodeLed(LED3);
-Scroll scroll(PB_7,PB_8,PB_9);
+Scroll scroll(PE_12, PE_14, PE_15);
 
 
 //=====[Declaration of external public global variables]=======================
@@ -75,7 +75,7 @@ bool alarmLowStorageActivation = true;
 
 //=====[Declarations (prototypes) of private functions]========================
 
-char* strcat( char* str , const char* strcat );
+// char* strcat( char* str , const char* strcat );
 
 void set_user_cursor( int user_position );
 
@@ -114,6 +114,7 @@ void userInterfaceInit()
 
 void userInterfaceUpdate()
 {
+    scroll.Update();
     userInterfaceDisplayUpdate();
 } 
 

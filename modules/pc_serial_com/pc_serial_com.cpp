@@ -40,8 +40,8 @@ static char fileName[SD_CARD_FILENAME_MAX_LENGTH] = "";
 
 //=====[Declarations (prototypes) of private functions]========================
 
-int strlen( const char* str );
-void strcat( char* str, const char* cat_str );
+// int strlen( const char* str );
+// void strcat( char* str, const char* cat_str );
 
 static void pcSerialComCharWrite( char chr );
 static void pcSerialComStringRead( char* str, int strLength );
@@ -84,6 +84,16 @@ char pcSerialComCharRead()
     return receivedChar;
 }
 
+static void pcSerialComStringRead( char* str, int strLength )
+{
+    int strIndex;
+    for ( strIndex = 0; strIndex < strLength; strIndex++) {
+        uartUsb.read( &str[strIndex] , 1 );
+        uartUsb.write( &str[strIndex] ,1 );
+    }
+    str[strLength]='\0';
+}
+
 void pcSerialComStringWrite( const char* str )
 {
     uartUsb.write( str, strlen(str) );
@@ -93,6 +103,13 @@ void pcSerialComIntWrite( int number )
 {
     char str[4] = "";
     sprintf( str, "%d", number );
+    pcSerialComStringWrite( str );
+}
+
+void pcSerialComCharWrite( char chr )
+{
+    char str[3] = "";
+    sprintf( str, "%c", chr );
     pcSerialComStringWrite( str );
 }
 

@@ -25,8 +25,8 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
-void strcat( char* str, const char* cat_str );
-int strlen( const char* str );
+// void strcat( char* str, const char* cat_str );
+// int strlen( const char* str );
 
 SDBlockDevice sd( SPI3_MOSI, SPI3_MISO, SPI3_SCK, SPI3_CS );
 

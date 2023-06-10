@@ -39,8 +39,8 @@ static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 
 //=====[Declarations (prototypes) of private functions]========================
 
-char* strcat( char* str , const char* strcat );
-char* strcpy( char* str , const char* strcat );
+// char* strcat( char* str , const char* strcat );
+// char* strcpy( char* str , const char* strcat );
 
 static void eventLogElementStateUpdate( bool lastState,
                                         bool currentState,

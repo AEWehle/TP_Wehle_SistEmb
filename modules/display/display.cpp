@@ -103,16 +103,16 @@ typedef struct{
 
 //=====[Declaration and initialization of public global objects]===============
 
-DigitalOut displayD0( D0 );
-DigitalOut displayD1( D1 );
-DigitalOut displayD2( D2 );
-DigitalOut displayD3( D3 );
-DigitalOut displayD4( D4 );
-DigitalOut displayD5( D5 );
-DigitalOut displayD6( D6 );
-DigitalOut displayD7( D7 );
-DigitalOut displayRs( D8 );
-DigitalOut displayEn( D9 );
+DigitalOut displayD0( D0 ); // PG9
+DigitalOut displayD1( D1 ); // PG14
+DigitalOut displayD2( D2 ); // PF15
+DigitalOut displayD3( D3 ); // PE13
+DigitalOut displayD4( D4 ); // PF14
+DigitalOut displayD5( D5 ); // PE11
+DigitalOut displayD6( D6 ); // PE9
+DigitalOut displayD7( D7 ); // PF13
+DigitalOut displayRs( D8 ); // PF12
+DigitalOut displayEn( D9 ); // PD15
 
 I2C i2cPcf8574( I2C1_SDA, I2C1_SCL ); 
 
@@ -390,7 +390,7 @@ static void displayCodeWrite( bool type, uint8_t dataBus )
         case DISPLAY_CONNECTION_I2C_PCF8574_IO_EXPANDER:    
             if ( type == DISPLAY_RS_INSTRUCTION )
                 displayPinWrite( DISPLAY_PIN_RS, DISPLAY_RS_INSTRUCTION);
-                else
+            else
                 displayPinWrite( DISPLAY_PIN_RS, DISPLAY_RS_DATA);
             displayPinWrite( DISPLAY_PIN_RW, DISPLAY_RW_WRITE );
             displayDataBusWrite( dataBus );
@@ -403,7 +403,7 @@ static void displayCodeWrite( bool type, uint8_t dataBus )
                 spiSt7920.write( ST7920_SPI_SYNCHRONIZING_BIT_STRING |
                                   ST7920_SPI_RW_WRITE |
                                   ST7920_SPI_RS_INSTRUCTION );                              
-                else
+            else
                 spiSt7920.write( ST7920_SPI_SYNCHRONIZING_BIT_STRING |
                                   ST7920_SPI_RW_WRITE |
                                   ST7920_SPI_RS_DATA );               
@@ -447,7 +447,8 @@ static void displayPinWrite( uint8_t pinName, int value )
             }
             break;
         case DISPLAY_CONNECTION_I2C_PCF8574_IO_EXPANDER:
-           if ( value ) {
+           if ( value ) 
+           {
                 switch( pinName ) {
                     case DISPLAY_PIN_D4: pcf8574.displayPinD4 = ON; break;
                     case DISPLAY_PIN_D5: pcf8574.displayPinD5 = ON; break;
@@ -460,7 +461,8 @@ static void displayPinWrite( uint8_t pinName, int value )
                     default: break;
                 }
             }
-            else {
+            else 
+            {
                 switch( pinName ) {
                     case DISPLAY_PIN_D4: pcf8574.displayPinD4 = OFF; break;
                     case DISPLAY_PIN_D5: pcf8574.displayPinD5 = OFF; break;

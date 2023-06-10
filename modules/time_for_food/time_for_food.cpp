@@ -13,8 +13,6 @@
 
 //=====[Declaration of private defines]========================================
 
-#define food_time_t int
-
 //=====[Declaration of private data types]=====================================
 
 //=====[Declaration and initialization of public global objects]===============
@@ -41,7 +39,7 @@ static float food_load_required = FOOD_LOAD_DEFAULT;
 //=====[Declarations (prototypes) of private functions]========================
 
 void sort_times();
-int char2int( char the_char );
+
 
 //=====[Implementations of public functions]===================================
 
@@ -110,17 +108,22 @@ void add_food_time( food_time_t new_time ){
     bool found = false;
     for ( int i = 0 ; i < timesIndex && !found ; i++ )
     {
-        if ( times_for_food[ i ] == new_time )
-        {
+        if ( times_for_food[ i ] == new_time ) 
             found = true;
-        }
     }
     if (!found) {
         times_for_food[timesIndex++]= new_time;
-        // timesIndex++;
+        sort_times();
     }
 }
 
+void add_food_time( int hour, int minute )
+{
+    food_time_t new_time  = hour * 6 + (int) minute/10;
+    // hora =  (número // 6), div entera de 6
+    // minutos = (número % 6) *60, el resto*60
+    add_food_time( new_time );
+}
 
 void change_food_time( food_time_t new_time, food_time_t old_time ){
      bool found = false;
@@ -140,13 +143,21 @@ void delete_food_time( food_time_t bad_time )
     bool found = false;
     for ( int i = 0 ; i < (timesIndex-1) ; i++ )
     {
-        if ( times_for_food[ i ] == bad_time )
+        if ( times_for_food[ i ] == bad_time && !found)
            found = true;
-        if ( found )
+        else if ( found )
         times_for_food[ i ] = times_for_food[i+1];
     }
 }
 
+
+void delete_food_time_in_position( int bad_time_position )
+{
+    for ( int i = bad_time_position ; i < (timesIndex-1) ; i++ )
+    {
+        times_for_food[ i ] = times_for_food[i+1];
+    }
+}
 
 
 //=====[Implementations of private functions]==================================

@@ -48,6 +48,7 @@ typedef enum {
     MINUTE_STATE
 } setTimeState_t;
 
+
 //=====[Declaration and initialization of public global objects]===============
 
 // InterruptIn gateOpenButton(PF_9);
@@ -324,10 +325,10 @@ static void displaySetDateState()
     switch ( settingDateState ){
     case YEAR_STATE:
     if ( scroll.Up() ) {
-        aumentar un año a la fecha actúa con la librería de time o alguna
-
-        else if (scroll.Down() )
-    disminuir un año
+        // aumentar un año a la fecha actúa con la librería de time o alguna
+        }
+    else if (scroll.Down() )
+    // disminuir un año
         if (scroll.Pressed() ) settingDateState = MONTH_STATE;
     break;
 
@@ -342,9 +343,7 @@ static void displaySetDateState()
         }
     break;
     }
-}
-
-sprintf(setDateString, "*Fecha    DD/MM/AAAA");
+    sprintf(setDateString, "*Fecha    DD/MM/AAAA");
     displayPositionStringWrite ( 0,1 , setDateString );    
 }
 
@@ -356,12 +355,11 @@ static void displaySetTimeState()
     switch ( settingTimeState ){
     case HOUR_STATE:
         if ( scroll.Up() ) {
-        aumentar una a la actual actúa con la librería de time o alguna
-    sumando segundos
+        // aumentar una a la actual actúa con la librería de time o alguna sumando segundos
         }
 
         else if ( scroll.Down() ){
-    disminuir una hora
+    // disminuir una hora
         }
         if ( scroll.Pressed() ) settingTimeState = MINUTE_STATE;
     break;
@@ -454,16 +452,16 @@ static void userInterfaceDisplaySetFoodTimesStateInit()
 
 static void userInterfaceDisplaySetFoodTimesStateUpdate()
 {
-int qtimes = get_times_q();
+    int qtimes = get_times_q();
     if( displayUserPosition > 4 + qtimes) 
         displayUserPosition = 4 + qtimes;
     else if( displayUserPosition < 1)
         displayUserPosition = 1;
 
-set_user_cursor( displayUserPosition );
+    set_user_cursor( displayUserPosition );
 
     char setFoodTimesString[21] = "";
-    switch(){
+    switch( displayUserPosition ){
     case 1: case 2: case 3: case 4:
         sprintf(setFoodTimesString, "Establecer horarios");
         displayPositionStringWrite ( 0,0 , setFoodTimesString );
@@ -512,7 +510,10 @@ static void userInterfaceDisplayBowlTareStateInit()
 
 static void userInterfaceDisplayBowlTareStateUpdate()
 {
-
+    if( scroll.Pressed() ){
+        bowl_tare();
+        displayState = DISPLAY_AJUSTES_STATE;
+    }
 }
 
 static void userInterfaceDisplayAlarmStorageStateUpdate(){

@@ -11,6 +11,7 @@
 #include "sd_card.h"
 #include "bowl.h"
 #include "food_storage.h"
+#include "time_for_food.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -39,6 +40,9 @@ static char fileName[SD_CARD_FILENAME_MAX_LENGTH] = "";
 
 //=====[Declarations (prototypes) of private functions]========================
 
+int strlen( const char* str );
+void strcat( char* str, const char* cat_str );
+
 static void pcSerialComCharWrite( char chr );
 static void pcSerialComStringRead( char* str, int strLength );
 
@@ -47,11 +51,17 @@ static void pcSerialComShowSdCardFile( char * fileName );
 
 static void pcSerialComCommandUpdate( char receivedChar );
 
+
 static void availableCommands();
 static void commandShowCurrentUnderStorageDetectorState();
 static void commandShowCurrentFoodLoadState();
 static void commandSetDateAndTime();
 static void commandShowDateAndTime();
+static void commandShowReleaseFood();
+static void commandShowBowlTare();
+static void commandShowSeeFoodTimes();
+static void commandShowAddFoodTimes();
+static void commandShowDeleteFoodTimes();
 static void commandShowStoredEvents();
 static void commandShowCurrentMotorState();
 static void commandEventLogSaveToSdCard();
@@ -122,11 +132,16 @@ static void pcSerialComCommandUpdate( char receivedChar )
 
 static void availableCommands()
 {
-    pcSerialComStringWrite( "Available commands:\r\n" );
+    pcSerialComStringWrite( "COMANDOS DISPONIBLES:\r\n" );
     pcSerialComStringWrite( "Presione 'a' o 'A' para saber si hay bajo almacenamiento\r\n" );
     pcSerialComStringWrite( "Presione 'c' o 'C' para obtener el peso actual de comida en bowl\r\n" );
-    pcSerialComStringWrite( "Presione 's' o 'S' para setear fecha y hora\r\n" );
-    pcSerialComStringWrite( "Presione 't' o 'T' para obtener la fecha y hora\r\n" );
+    pcSerialComStringWrite( "Presione 's' o 'S' para setear fecha y hora actual\r\n" );
+    pcSerialComStringWrite( "Presione 't' o 'T' para obtener la fecha y hora actual\r\n" );
+    pcSerialComStringWrite( "Presione 'x' o 'X' para liberar un poco de comida\r\n" );
+    pcSerialComStringWrite( "Presione 'b' o 'B' para establecer la tara el bowl\r\n" );
+    pcSerialComStringWrite( "Presione 'h' o 'H' para ver los horarios de comida\r\n" );
+    pcSerialComStringWrite( "Presione 'n' o 'N' para agregar un horario de comida\r\n" );
+    pcSerialComStringWrite( "Presione 'b' o 'B' para borrar un horario de comida\r\n" );
     pcSerialComStringWrite( "Presione 'e' o 'E' para obtener los eventos guardados\r\n" );
     pcSerialComStringWrite( "Presione 'm' o 'M' para mostrar el estado del motor\r\n" );
     pcSerialComStringWrite( "Presione 'g' o 'G' para guardar los eventos en la tarjeta SD\r\n" );
@@ -138,7 +153,7 @@ static void availableCommands()
 
 static void commandShowCurrentUnderStorageDetectorState()
 {
-    if (underStorageDetectorStateRead() ) {
+    if (getUnderStorageDetectorState() ) {
         pcSerialComStringWrite( "Hay poco almacenamiento de comida\r\n");
     } else {
         pcSerialComStringWrite( "Hay suficiente almacenamiento de comida\r\n");
@@ -152,6 +167,69 @@ static void commandShowCurrentFoodLoadState()
     pcSerialComStringWrite( str );
     
 }
+
+
+static void commandShowReleaseFood()
+{
+    char str[100] = "";
+    sprintf ( str, "Liberando un poco de comida.\r\n");
+    bowl_charge( 30.0 );
+    pcSerialComStringWrite( str );
+}
+
+
+static void commandShowBowlTare()
+{
+    char str[100] = "";
+    sprintf ( str, "Tara establecida.\n\rSi el bowl no estaba vacío, vacíelo y vuelva a presionar x o X.\r\n");
+    bowl_tare();
+}
+
+static void commandShowSeeFoodTimes()
+{
+    char str[100] = "Horarios:";
+    char cat_str[10] = "";
+    int qtimes = get_times_q();
+    int food_time;
+    for (int i = 0 ; i < qtimes ; i++){
+        food_time = get_time_for_food( i );
+        sprintf( cat_str, " %d:%d,", (int) food_time/6, food_time % 6 *60 );
+        strcat( str, cat_str );
+    }
+
+    char input;
+    pcSerialComStringWrite( "\r\nPara borrar presione x o X, para agregar presione n o N" );
+    input = pcSerialComCharRead();
+    pcSerialComStringWrite("\r\n");
+    switch ( input ) {
+        case 'n': case 'N':{
+            char str_minute[3] = "";
+            char str_hour[3] = "";
+            pcSerialComStringWrite("Escriba dos dígitos para la hora (00-23): ");
+            pcSerialComStringRead( str_hour, 2);
+            pcSerialComStringWrite("\r\n");
+
+            pcSerialComStringWrite("Escriba dos dígitos para el minuto (00-59): ");
+            pcSerialComStringRead( str_minute, 2);
+            pcSerialComStringWrite("\r\n");
+            int hour = char2int( str_hour[0] )*10 + char2int( str_hour[1] );
+            int minute = char2int( str_minute[0] )*10 + char2int( str_minute[1] );
+            add_food_time( hour, minute );
+        break;}
+        case 'x': case 'X':{
+            pcSerialComStringWrite( "Seleccione desde 1 el horario a borrar" );
+            input = pcSerialComCharRead();
+            pcSerialComStringWrite("\r\n");
+            int position = char2int( input );
+            delete_food_time_in_position( position - 1 );
+        break;}  
+    }
+}
+
+
+static void commandShowSeeFoodTimes();
+static void commandShowAddFoodTimes();
+static void commandShowDeleteFoodTimes();
 
 static void commandEventLogSaveToSdCard()
 {
@@ -227,13 +305,11 @@ static void commandShowStoredEvents()
 
 static void commandShowCurrentMotorState()
 {
-    switch ( motorDirectionRead() ) {
+    switch ( motorStateRead() ) {
         case STOPPED: 
             pcSerialComStringWrite( "El motor está parado\r\n"); break;
-        case DIRECTION_1: 
-            pcSerialComStringWrite( "Motor girando en la dirección 1\r\n"); break;
-        case DIRECTION_2: 
-            pcSerialComStringWrite( "Motor girando en la dirección 2\r\n"); break;
+        case ACTIVE: 
+            pcSerialComStringWrite( "Motor girando.\r\n"); break;
     }
 }
 

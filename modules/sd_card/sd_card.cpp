@@ -44,17 +44,17 @@ FATFileSystem sdCardFileSystem("sd", &sd);
 
 bool sdCardInit()
 {
-    pcSerialComStringWrite("Looking for a filesystem in the SD card... \r\n");
+    pcSerialComStringWrite("Buscando un filesystem en la tarjeta SD... \r\n");
     sdCardFileSystem.mount(&sd);
     DIR *sdCardListOfDirectories = opendir("/sd/");
     if ( sdCardListOfDirectories != NULL ) {
-        pcSerialComStringWrite("Filesystem found in the SD card. \r\n");
+        pcSerialComStringWrite("Se encontró un filesystem en la tarjeta SD. \r\n");
         closedir(sdCardListOfDirectories);
         return true;
     } else {
-        pcSerialComStringWrite("Filesystem not mounted. \r\n");
-        pcSerialComStringWrite("Insert an SD card and ");
-        pcSerialComStringWrite("reset the NUCLEO board.\r\n");
+        pcSerialComStringWrite("Filesystem no encontrado. \r\n");
+        pcSerialComStringWrite("Inserte una tarjeta SD y ");
+        pcSerialComStringWrite("reset la placa.\r\n");
         return false;
     }
 }

@@ -10,6 +10,9 @@
 #include "sd_card.h"
 #include "time_for_food.h"
 
+// sacar, solo prueba
+// #include "pc_serial_com.h"
+
 
 //=====[Declaration of private defines]========================================
 
@@ -39,7 +42,7 @@ static float food_load_required = FOOD_LOAD_DEFAULT;
 //=====[Declarations (prototypes) of private functions]========================
 
 void sort_times();
-
+bool its_time( char* actual_time );
 
 //=====[Implementations of public functions]===================================
 
@@ -48,8 +51,32 @@ void timeForFoodInit()
     // Por default de entrega comida hasta que haya food_load_required en el bowl a las 8hs y a las 20hs
 }
 
+void timeForFoodUpdate()
+{
+    //    pcSerialComStringWrite( "time for food update" );
+
+    char* actual_time = dateAndTimeRead(); //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
+    if( its_time( actual_time ))
+    {
+        if( !charging )
+        {
+            charging = true;
+            if ( food_mode == OPEN )
+                bowl_charge( food_load_required ); 
+                // a lazo abierto hay que cargar siempre lo mismo sin importar cuanto haya
+            else 
+                bowl_charge( food_load_required - get_food_load() );
+                // a lazo cerrado hay que cargar hasta que haya food load required en el bowl
+        }
+    }
+    else charging = false;
+}
+
 void set_food_load_required( float new_food_load ){
     food_load_required = new_food_load;
+}
+float get_food_load_required( ){
+    return food_load_required;
 }
 
 void change2_open_mode(){
@@ -85,25 +112,6 @@ bool its_time( char* actual_time )
     return false;
 }
 
-
-void timeForFoodUpdate()
-{
-    char* actual_time = dateAndTimeRead(); //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
-    if( its_time( actual_time ))
-    {
-        if( !charging )
-        {
-            charging = true;
-            if ( food_mode == OPEN )
-                bowl_charge( food_load_required ); 
-                // a lazo abierto hay que cargar siempre lo mismo sin importar cuanto haya
-            else 
-                bowl_charge( food_load_required - get_food_load() );
-                // a lazo cerrado hay que cargar hasta que haya food load required en el bowl
-        }
-    }
-    else charging = false;
-}
 
 
 void add_food_time( food_time_t new_time ){

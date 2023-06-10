@@ -60,8 +60,6 @@ static void commandShowDateAndTime();
 static void commandShowReleaseFood();
 static void commandShowBowlTare();
 static void commandShowSeeFoodTimes();
-static void commandShowAddFoodTimes();
-static void commandShowDeleteFoodTimes();
 static void commandShowStoredEvents();
 static void commandShowCurrentMotorState();
 static void commandEventLogSaveToSdCard();
@@ -114,7 +112,8 @@ void pcSerialComCharWrite( char chr )
 }
 
 void pcSerialComUpdate()
-{
+{  
+// pcSerialComStringWrite( "pc serial com update" );
     char receivedChar = pcSerialComCharRead();
     if( receivedChar != '\0' ) {
         switch ( pcSerialComMode ) {
@@ -138,6 +137,9 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case 'c': case 'C': commandShowCurrentFoodLoadState(); break;
         case 's': case 'S': commandSetDateAndTime(); break;
         case 't': case 'T': commandShowDateAndTime(); break;
+        case 'x': case 'X': commandShowReleaseFood(); break;
+        case 'b': case 'B': commandShowBowlTare(); break;
+        case 'h': case 'H': commandShowSeeFoodTimes(); break;
         case 'e': case 'E': commandShowStoredEvents(); break;
         case 'm': case 'M': commandShowCurrentMotorState(); break;
         case 'g': case 'G': commandEventLogSaveToSdCard(); break;
@@ -156,9 +158,7 @@ static void availableCommands()
     pcSerialComStringWrite( "Presione 't' o 'T' para obtener la fecha y hora actual\r\n" );
     pcSerialComStringWrite( "Presione 'x' o 'X' para liberar un poco de comida\r\n" );
     pcSerialComStringWrite( "Presione 'b' o 'B' para establecer la tara el bowl\r\n" );
-    pcSerialComStringWrite( "Presione 'h' o 'H' para ver los horarios de comida\r\n" );
-    pcSerialComStringWrite( "Presione 'n' o 'N' para agregar un horario de comida\r\n" );
-    pcSerialComStringWrite( "Presione 'b' o 'B' para borrar un horario de comida\r\n" );
+    pcSerialComStringWrite( "Presione 'h' o 'H' para ver o modificar los horarios de comida\r\n" );
     pcSerialComStringWrite( "Presione 'e' o 'E' para obtener los eventos guardados\r\n" );
     pcSerialComStringWrite( "Presione 'm' o 'M' para mostrar el estado del motor\r\n" );
     pcSerialComStringWrite( "Presione 'g' o 'G' para guardar los eventos en la tarjeta SD\r\n" );
@@ -243,10 +243,6 @@ static void commandShowSeeFoodTimes()
     }
 }
 
-
-static void commandShowSeeFoodTimes();
-static void commandShowAddFoodTimes();
-static void commandShowDeleteFoodTimes();
 
 static void commandEventLogSaveToSdCard()
 {

@@ -4,6 +4,8 @@
 #include "arm_book_lib.h"
 
 #include "infrared_sensor.h"
+    // sacar, solo prueba
+// #include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -30,6 +32,8 @@ void foodStorageInit()
 
 void foodStorageUpdate()
 {
+
+// pcSerialComStringWrite( "storage update" );
     infraredSensorUpdate();
     underStorageDetectorState = !infraredSensorRead();
 

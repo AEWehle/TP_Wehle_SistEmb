@@ -7,6 +7,9 @@
 #include "load_sensorHX711.h"
 #include "motor.h"
 
+// sacar, solo prueba
+// #include "pc_serial_com.h"
+
 //=====[Declaration of private defines]========================================
 
 //=====[Declaration of private data types]=====================================
@@ -84,6 +87,7 @@ float get_food_load() {
 
 void bowlUpdate()
 {
+// pcSerialComStringWrite( "bowl update" );
     if( (get_food_load() > food_load_required) && chargingState ){
         motorDeactivation();
         chargingState = OFF;

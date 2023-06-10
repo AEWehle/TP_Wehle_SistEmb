@@ -4,6 +4,8 @@
 #include "arm_book_lib.h"
 
 #include "motor.h"
+    // sacar, solo prueba
+// #include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -55,16 +57,17 @@ void motorDeactivation()
 }
 
 void motorControlUpdate()
-{        
+{
+            // pcSerialComStringWrite( "motor update" );
     if( motorState == ACTIVE ){
         motorM1Pin.input();
         motorM2Pin.input();
-        motorState = STOPPED;
+        // motorState = STOPPED;
     }
     else{ // ( motorState == STOPPED )
         motorM2Pin.input();
         motorM1Pin.output();
         motorM1Pin = LOW;
-        motorState = ACTIVE;
-        }
+        // motorState = ACTIVE;
+    }
 }

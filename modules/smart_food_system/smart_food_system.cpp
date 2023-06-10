@@ -35,26 +35,26 @@
 
 void smartFoodSystemInit()
 {
-    userInterfaceInit();
-    pcSerialComInit();
-    motorControlInit();
-    sdCardInit();
-
     // agregados para el dispenser
     timeForFoodInit();
     bowlInit();
     foodStorageInit();
+    motorControlInit();
+
+    pcSerialComInit();
+    sdCardInit();
+    userInterfaceInit();
 }
 
 void smartFoodSystemUpdate()
-{   
+{
     timeForFoodUpdate();
     bowlUpdate();
     foodStorageUpdate();
-    userInterfaceUpdate();
-    eventLogUpdate();
-    pcSerialComUpdate();
     motorControlUpdate();
+    userInterfaceUpdate();
+    pcSerialComUpdate();
+    eventLogUpdate();
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

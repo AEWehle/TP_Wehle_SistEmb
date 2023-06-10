@@ -49,7 +49,8 @@ static void eventLogElementStateUpdate( bool lastState,
 //=====[Implementations of public functions]===================================
 
 void eventLogUpdate()
-{
+{  
+// pcSerialComStringWrite( "event log update" );
     bool currentState = foodIncreasedStateRead();
     eventLogElementStateUpdate( foodIncreasedLastState, currentState, "Aumento de comida a " );
     foodIncreasedLastState = currentState;

@@ -15,8 +15,6 @@
 #include "time_for_food.h"
 #include "time.h"
 #include "Scroll.h"
-    // sacar, solo prueba
-// #include "pc_serial_com.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -36,7 +34,8 @@ typedef enum {
     DISPLAY_AJUSTES_ALARM_STORAGE_STATE,
     DISPLAY_AJUSTES_SET_ACTUAL_DATE_STATE,
     DISPLAY_AJUSTES_SET_ACTUAL_TIME_STATE,
-    DISPLAY_MOVING_MOTOR_STATE
+    DISPLAY_AJUSTES_SET_LOAD_STATE,
+    DISPLAY_AJUSTES_ADD_FOOD_TIME_STATE
 } displayState_t;
 
 typedef enum {
@@ -51,13 +50,9 @@ typedef enum {
     MINUTE_STATE
 } setTimeState_t;
 
-
 //=====[Declaration and initialization of public global objects]===============
 
-// InterruptIn gateOpenButton(PF_9);
-// InterruptIn gateCloseButton(PF_8);// DigitalOut incorrectCodeLed(LED3);
 Scroll scroll(PE_12, PE_14, PE_15);
-
 
 //=====[Declaration of external public global variables]=======================
 
@@ -134,10 +129,14 @@ static void userInterfaceDisplayUpdate()
 {
     static int accumulatedDisplayTime = 0;
         
-    if ( scroll.Up() )
+    if ( scroll.Up() ){
         displayUserPosition++;
-    else if( scroll.Down() )
+        scroll.disableUp();
+    }
+    else if( scroll.Down() ){
         displayUserPosition--;
+        scroll.disableDown();
+    }
 
     if( accumulatedDisplayTime >=
         displayRefreshTimeMs ) { 
@@ -155,7 +154,7 @@ static void userInterfaceDisplayUpdate()
         case DISPLAY_AJUSTES_RELEASE_FOOD_STATE:
             userInterfaceDisplayReleaseFoodStateUpdate();
             break;
-        case DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE:
+        case     DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE:
             userInterfaceDisplaySetFoodTimesStateUpdate();
             break;
         case DISPLAY_AJUSTES_BOWL_TARE_STATE:
@@ -170,8 +169,11 @@ static void userInterfaceDisplayUpdate()
         case DISPLAY_AJUSTES_SET_ACTUAL_TIME_STATE:
             displaySetDateState();
             break;
-        case DISPLAY_MOVING_MOTOR_STATE:
-            // userInterfaceDisplayAlarmStorageStateUpdate();
+        case DISPLAY_AJUSTES_SET_LOAD_STATE:
+            void userInterfaceSetFoodLoad();            
+            break;
+        case DISPLAY_AJUSTES_ADD_FOOD_TIME_STATE:
+            void userInterfaceAddFoodTime();
             break;
         default:
             userInterfaceDisplayReportStateInit();
@@ -206,6 +208,7 @@ static void userInterfaceDisplayReportStateInit()
 static void userInterfaceDisplayReportStateUpdate()
 {
     if(  scroll.Pressed() ){
+        scroll.disablePressed();
         displayState = DISPLAY_AJUSTES_STATE;
         return;
     }
@@ -262,6 +265,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
         displayUserPosition = 0;
 
     if(  scroll.Pressed() ){
+        scroll.disablePressed();
         if ( displayUserPosition == 0 ){
             displayState = DISPLAY_REPORT_STATE;
         }
@@ -326,32 +330,44 @@ static void displaySetDateState()
     case YEAR_STATE:
         if ( scroll.Up() ) {
             rtcTime -> tm_year++; // aumentar un año
+            scroll.disableUp();
         }
         else if (scroll.Down() ){
             rtcTime -> tm_year--; // disminuir un año
+            scroll.disableDown();
         }
-        if (scroll.Pressed() ) 
+        if (scroll.Pressed() ) {
+            scroll.disablePressed();
             settingDateState = MONTH_STATE;
+        }
     break;
 
     case MONTH_STATE:
         if ( scroll.Up() ) {
             rtcTime -> tm_mon++; // aumentar un mes
+            scroll.disableUp();
         }
         else if (scroll.Down() ){
             rtcTime -> tm_mon--; // disminuir un mes
+            scroll.disableDown();
         }
-        if (scroll.Pressed() ) settingDateState = DAY_STATE;
+        if (scroll.Pressed() ) {
+            scroll.disablePressed();
+            settingDateState = DAY_STATE;
+        }
     break;
 
     case DAY_STATE:
         if ( scroll.Up() ) {
             rtcTime -> tm_mday++; // aumentar un dia
+            scroll.disableUp();
         }
         else if (scroll.Down() ){
             rtcTime -> tm_mday--; // disminuir un dia
+            scroll.disableDown();
         }
         if (scroll.Pressed() ){
+            scroll.disablePressed();
             settingDateState = YEAR_STATE;
             displayState = DISPLAY_AJUSTES_SET_DATE_TIME_STATE;
         }
@@ -365,7 +381,6 @@ static void displaySetDateState()
 
 static void displaySetTimeState()
 {
-    char setDateString[21] = "";
     time_t rawtime;
     time( &rawtime );
     struct tm* rtcTime = localtime(&rawtime);
@@ -377,18 +392,25 @@ static void displaySetTimeState()
         }
         else if (scroll.Down() ){
             rtcTime -> tm_hour--; // disminuir una hora
+            scroll.disableDown();
         }
-        if ( scroll.Pressed() ) settingTimeState = MINUTE_STATE;
+        if ( scroll.Pressed() ) {
+            scroll.disablePressed();
+            settingTimeState = MINUTE_STATE;
+        }
     break;
 
     case MINUTE_STATE:
         if ( scroll.Up() ) {
             rtcTime -> tm_min++; // aumentar un minuto
+            scroll.disableUp();
         }
         else if (scroll.Down() ){
             rtcTime -> tm_min--; // disminuir un minuto
+            scroll.disableDown();
         }
         if ( scroll.Pressed() ){
+            scroll.disablePressed();
             settingTimeState = HOUR_STATE;
             displayState = DISPLAY_AJUSTES_SET_DATE_TIME_STATE;
         }
@@ -429,6 +451,7 @@ static void userInterfaceDisplaySetDateTimeStateUpdate()
     displayPositionStringWrite ( 14,3 , setDateTimeString );
 
     if(  scroll.Pressed() ){
+        scroll.disablePressed();
         switch ( displayUserPosition ){
         case 3: 
             displayState = DISPLAY_AJUSTES_STATE;
@@ -472,11 +495,15 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
 {
     if(  scroll.Pressed() )
     {
+        scroll.disablePressed();
         displayState = DISPLAY_AJUSTES_STATE;
         return;
     }
-    if( scroll.Down() || scroll.Up() ) 
+    if( scroll.Down() || scroll.Up() ) {
         bowl_charge( 30.0 ); // le suma 30g al tacho 
+        scroll.disableUp();
+        scroll.disableDown();
+    }
     
     char releaseFoodString[21] = "";
     sprintf(releaseFoodString, "Peso: %.0f g", get_food_load() );
@@ -492,6 +519,8 @@ static void userInterfaceDisplaySetFoodTimesStateInit()
     displayUserPosition = 0;
 }
 
+
+
 static void userInterfaceDisplaySetFoodTimesStateUpdate()
 {
     int qtimes = get_times_q();
@@ -503,22 +532,21 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
     
     if(  scroll.Pressed() )
     {
+        scroll.disablePressed();
         switch( displayUserPosition ){
         case 0: 
             displayState = DISPLAY_AJUSTES_STATE; 
-            return;
         break;
         case 1: 
             change2_closed_mode();
-            // modificar peso
+            displayState = DISPLAY_AJUSTES_SET_LOAD_STATE;
         break;
         case 2: 
             change2_open_mode(); 
-            //modificar peso
+            displayState = DISPLAY_AJUSTES_SET_LOAD_STATE;
         break;
         case 3: 
-            userInterfaceAddFoodTime();
-            return;
+            displayState = DISPLAY_AJUSTES_ADD_FOOD_TIME_STATE;
         break;
         default:{
         // int food_time;
@@ -531,8 +559,8 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
         // set_user_cursor( displayUserPosition % 4 );
         break;}
         }
+        return;
     }
-
 
     char setFoodTimesString[21] = "";
     switch( displayUserPosition ){
@@ -571,9 +599,84 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
     }
 }
 
-void userInterfaceAddFoodTime(){
 
+
+void userInterfaceAddFoodTime(){
+    time_t rawtime;
+    time( &rawtime );
+    struct tm* rtcTime = localtime(&rawtime);
+    rtcTime -> tm_min = (int) (rtcTime -> tm_min/10) *10;
+
+    switch ( settingTimeState ){
+    case HOUR_STATE:
+        if ( scroll.Up() ) {
+            rtcTime -> tm_hour++; // aumentar una hora
+            scroll.disableUp();
+        }
+        else if (scroll.Down() ){
+            rtcTime -> tm_hour--; // disminuir una hora
+            scroll.disableDown();
+        }
+        if ( scroll.Pressed() ) {
+            scroll.disablePressed();
+            settingTimeState = MINUTE_STATE;
+        }
+    break;
+
+    case MINUTE_STATE:
+        if ( scroll.Up() ) {
+            rtcTime -> tm_min = rtcTime -> tm_min + 10; // aumentar
+            scroll.disableUp();
+        }
+        else if (scroll.Down() ){
+            rtcTime -> tm_min = rtcTime -> tm_min - 10; // disminuir
+            scroll.disableDown();
+        }
+        if ( scroll.Pressed() ){
+            settingTimeState = HOUR_STATE;
+            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+            add_food_time( rtcTime -> tm_hour, rtcTime -> tm_min );
+        }
+    break;
+    }
+
+    char setTimeString[21] = "";
+    sprintf(setTimeString, "*Nueva Hora %d:%d", rtcTime -> tm_hour, rtcTime -> tm_min);
+    displayPositionStringWrite ( 0,3 , setTimeString );
 }
+
+
+
+void userInterfaceSetFoodLoad(){
+    if( scroll.Up() ) {
+        set_food_load_required( get_food_load_required() + 5 );
+        scroll.disableUp();
+    }
+    if( scroll.Down() ) {
+        set_food_load_required( get_food_load_required() - 5 );
+        scroll.disableDown();
+    }
+    if( scroll.Pressed() ) {
+        scroll.disablePressed();
+        set_food_load_required( get_food_load_required() );
+        displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+        return;
+    }
+    char setFoodTimesString[21] = "";
+    if( get_food_mode() == CLOSED ){
+        sprintf(setFoodTimesString, "Liberar hasta:%.0fg", get_food_load_required());
+        displayPositionStringWrite ( 1,1 , setFoodTimesString );
+        sprintf(setFoodTimesString, "Liberar siempre:OFF");
+        displayPositionStringWrite ( 1,2 , setFoodTimesString );
+    }
+    else{
+        sprintf(setFoodTimesString, "Liberar hasta:  OFF");
+        displayPositionStringWrite ( 1,1 , setFoodTimesString );
+        sprintf(setFoodTimesString, "Liberar siempre:%.0fg", get_food_load_required());
+        displayPositionStringWrite ( 1,2 , setFoodTimesString );
+    }
+}
+
 
 
 // DISPLAY en establecer tara del bowl
@@ -602,6 +705,7 @@ static void userInterfaceDisplayBowlTareStateInit()
 static void userInterfaceDisplayBowlTareStateUpdate()
 {
     if( scroll.Pressed() ){
+        scroll.disablePressed();
         bowl_tare();
         displayState = DISPLAY_AJUSTES_STATE;
     }

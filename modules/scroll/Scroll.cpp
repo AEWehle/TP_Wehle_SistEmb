@@ -27,6 +27,7 @@ Scroll::Scroll(DigitalIn CLK_pin, DigitalIn DT_pin, DigitalIn SW_pin): CLK(CLK_p
     scrollState = HIGH_STATE;
 	this->SWPressed = false;
 	this->DTState = false;
+	this->CLKState = false;
     this -> scrollUp = false;
     this -> scrollDown = false;
 }
@@ -55,39 +56,55 @@ void Scroll::Update(){
         break;
     }
     
+    // scroll
 	switch ( scrollState ) {
     case HIGH_STATE:
-        if(  !this->CLK.read() ){ // si clk apretado entra
-            DTState = this->DT.read() ;
+        if(     CLKState != this->CLK.read() ){ // si clk apretado entra
+            DTState = this->DT.read();
+            CLKState = this->CLK.read();
             scrollState = EDGE_STATE;
         }
-        this -> scrollDown = false;
-        this -> scrollUp = false;
+
         break;
-    case LOW_STATE:
+
+    case LOW_STATE: 
     case EDGE_STATE: 
-        if( !this->CLK.read() && DTState == this->DT.read() ){ //si clk sigue apretado y DT no cambió
-            if( DTState ){ // horario
+        if( CLKState == this->CLK.read() && DTState == this->DT.read() ) // checked debounce
+        {
+            if( CLKState != DTState )
+            {
                 this -> scrollDown = false;
                 this -> scrollUp = true;  
             }
-            else{          // antihorario
+            else
+            {
                 this -> scrollDown = true;                
                 this -> scrollUp = false;
             }
-        }
-        else
-            scrollState = HIGH_STATE;
+        }          
+        scrollState = HIGH_STATE;
         break;
     }
+}
+
+void Scroll::disablePressed(){
+	SWPressed = false;
 }
 
 bool Scroll::Pressed(){
 	return SWPressed;
 }
 
+void Scroll::disableUp(){
+	scrollUp = false;
+}
+
 bool Scroll::Up(){
 	return scrollUp;
+}
+
+void Scroll::disableDown(){
+	scrollDown = false;
 }
 
 bool Scroll::Down(){

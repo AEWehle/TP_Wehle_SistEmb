@@ -23,6 +23,7 @@ private:
 	DigitalIn SW;	//pin del pulsador
 	bool SWPressed;	
 	bool DTState;	
+	bool CLKState;	
     encoderState_t buttonState;
     encoderState_t scrollState;
     bool scrollUp;
@@ -36,6 +37,10 @@ void Update();
 bool Pressed();
 bool Down();
 bool Up();
+void disablePressed();
+void disableUp();
+void disableDown();
+
 };
 
 //=====[#include guards - end]=================================================

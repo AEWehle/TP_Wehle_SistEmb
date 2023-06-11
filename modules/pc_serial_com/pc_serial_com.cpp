@@ -59,7 +59,7 @@ static void commandSetDateAndTime();
 static void commandShowDateAndTime();
 static void commandShowReleaseFood();
 static void commandShowBowlTare();
-static void commandShowSeeFoodTimes();
+static void commandShowFoodTimes();
 static void commandShowStoredEvents();
 static void commandShowCurrentMotorState();
 static void commandEventLogSaveToSdCard();
@@ -139,7 +139,7 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case 't': case 'T': commandShowDateAndTime(); break;
         case 'x': case 'X': commandShowReleaseFood(); break;
         case 'b': case 'B': commandShowBowlTare(); break;
-        case 'h': case 'H': commandShowSeeFoodTimes(); break;
+        case 'h': case 'H': commandShowFoodTimes(); break;
         case 'e': case 'E': commandShowStoredEvents(); break;
         case 'm': case 'M': commandShowCurrentMotorState(); break;
         case 'g': case 'G': commandEventLogSaveToSdCard(); break;
@@ -199,20 +199,23 @@ static void commandShowBowlTare()
 {
     char str[100] = "";
     sprintf ( str, "Tara establecida.\n\rSi el bowl no estaba vacío, vacíelo y vuelva a presionar x o X.\r\n");
+    pcSerialComStringWrite( str );
     bowl_tare();
 }
 
-static void commandShowSeeFoodTimes()
+static void commandShowFoodTimes()
 {
     char str[100] = "Horarios:";
     char cat_str[10] = "";
+    pcSerialComStringWrite( str );
     int qtimes = get_times_q();
     int food_time;
     for (int i = 0 ; i < qtimes ; i++){
         food_time = get_time_for_food( i );
-        sprintf( cat_str, " %d:%d,", (int) food_time/6, food_time % 6 *60 );
-        strcat( str, cat_str );
+        sprintf( str, " %d:%d,", (int) food_time/6, food_time % 6 *60 );
+        pcSerialComStringWrite( str ); 
     }
+    pcSerialComStringWrite( "\r\n" );
 
     char input;
     pcSerialComStringWrite( "\r\nPara borrar presione x o X, para agregar presione n o N" );

@@ -31,6 +31,7 @@ void delete_food_time_in_position( int bad_time_position );
 void set_food_load_required( float new_food_load );
 float get_food_load_required( );
 loop_mode_t get_food_mode();
+void change_to_food_mode( loop_mode_t newMode );
 void change2_open_mode();
 void change2_closed_mode();
 

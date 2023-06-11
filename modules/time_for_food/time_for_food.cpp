@@ -79,6 +79,10 @@ float get_food_load_required( ){
     return food_load_required;
 }
 
+void change_to_food_mode( loop_mode_t newMode ){
+    food_mode = newMode;
+}
+
 void change2_open_mode(){
     food_mode = OPEN;
 }

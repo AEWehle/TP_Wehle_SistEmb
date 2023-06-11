@@ -25,7 +25,8 @@
 //=====[Declaration and initialization of public global variables]=============
 
 //=====[Declaration and initialization of private global variables]============
-
+int time_increment_update;
+const int system_time_update = (int)10/SYSTEM_TIME_INCREMENT_MS;
 //=====[Declarations (prototypes) of private functions]========================
 
 //=====[Implementations of public functions]===================================
@@ -35,6 +36,7 @@
 
 void smartFoodSystemInit()
 {
+    time_increment_update = system_time_update;
     // agregados para el dispenser
     timeForFoodInit();
     bowlInit();
@@ -48,13 +50,17 @@ void smartFoodSystemInit()
 
 void smartFoodSystemUpdate()
 {
-    timeForFoodUpdate();
-    bowlUpdate();
-    foodStorageUpdate();
-    motorControlUpdate();
+    if( time_increment_update >=  system_time_update ){
+        timeForFoodUpdate();
+        bowlUpdate();
+        foodStorageUpdate();
+        motorControlUpdate();
+        pcSerialComUpdate();
+        eventLogUpdate();
+        time_increment_update = 0;
+    }
+    
     userInterfaceUpdate();
-    pcSerialComUpdate();
-    eventLogUpdate();
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

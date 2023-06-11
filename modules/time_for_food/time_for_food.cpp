@@ -24,7 +24,8 @@
 
 //=====[Declaration and initialization of public global variables]=============
 
-const int MAX_TIMES_DAY = 50;
+const int MAX_TIMES_DAY = (int)(24*60/FOOD_TIME_MINUTES_INCREMENT); 
+// Como FOOD TIME INCREMENT es 10 minutos, es posible expulsar cada 144 veces en un dia
 static int timesIndex = 2;
 // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
 static food_time_t times_for_food[MAX_TIMES_DAY] = { 48 , 120 }; 
@@ -133,20 +134,25 @@ void add_food_time( food_time_t new_time ){
 
 void add_food_time( int hour, int minute )
 {
-    food_time_t new_time  = hour * 6 + (int) minute/10;
+    food_time_t new_time  = hour * (int)(60/FOOD_TIME_MINUTES_INCREMENT)  + (int) (minute/FOOD_TIME_MINUTES_INCREMENT);
     // hora =  (número // 6), div entera de 6
     // minutos = (número % 6) *60, el resto*60
     add_food_time( new_time );
 }
 
 void change_food_time( food_time_t new_time, food_time_t old_time ){
-     bool found = false;
-     for ( int i = 0 ; i < timesIndex && !found ; i++ )
+    bool found = false;
+    if( new_time < 0)
+        new_time = 0;
+    else if( new_time >= MAX_TIMES_DAY ) 
+        new_time = MAX_TIMES_DAY - 1;
+
+    for ( int i = 0 ; i < timesIndex && !found ; i++ )
     {
         if ( times_for_food[ i ] == old_time )
         {
-           found = true;
-           times_for_food[i] = new_time;
+        found = true;
+        times_for_food[i] = new_time;
         }
     }
 }

@@ -52,8 +52,8 @@ typedef enum {
 } setTimeState_t;
 
 typedef enum {
-    HOUR_STATE,
-    MINUTE_STATE,
+    FOOD_HOUR_STATE,
+    FOOD_MINUTE_STATE,
     ASK_DELETE_TIME_STATE,
     ASK_OK_TIME_STATE
 } setFoodTimeState_t;
@@ -77,7 +77,7 @@ static int index_food_time_selected;
 static displayState_t displayState = DISPLAY_REPORT_STATE;
 static setDateState_t settingDateState = YEAR_STATE;
 static setTimeState_t settingTimeState = HOUR_STATE;
-static setFoodTimeState_t settingFoodTimeState = HOUR_STATE;
+static setFoodTimeState_t settingFoodTimeState = FOOD_HOUR_STATE;
 static int displayUserPosition = 0;
 static int displayRefreshTimeMs = display_refresh_time_report;
 bool alarmLowStorageActivation = true;
@@ -98,21 +98,17 @@ static void userInterfaceDisplayReportStateUpdate();
 static void userInterfaceDisplayAjustesStateInit();
 static void userInterfaceDisplayAjustesStateUpdate();
 
-static void userInterfaceDisplaySetDateTimeStateInit();
 static void userInterfaceDisplaySetDateTimeStateUpdate();
 static void displaySetDateState();
 static void displaySetTimeState();
 
-static void userInterfaceDisplayReleaseFoodStateInit();
 static void userInterfaceDisplayReleaseFoodStateUpdate();
 
-static void userInterfaceDisplaySetFoodTimesStateInit();
 static void userInterfaceDisplaySetFoodTimesStateUpdate();
 static void userInterfaceSetFoodLoad();            
 static void userInterfaceAddFoodTime();
 static void userInterfaceModifyFoodTime();
 
-static void userInterfaceDisplayBowlTareStateInit();
 static void userInterfaceDisplayBowlTareStateUpdate();
 
 static void userInterfaceDisplayAlarmStorageStateUpdate();
@@ -141,13 +137,13 @@ static void userInterfaceDisplayInit()
 static void userPositionUpdate ()
 {
     if ( scroll.Up() ){
-            scroll.disableUp();
-            displayUserPosition++;
-        }
-        else if( scroll.Down() ){
-            scroll.disableDown();
-            displayUserPosition--;
-        }
+        scroll.disableUp();
+        displayUserPosition++;
+    }
+    else if( scroll.Down() ){
+        scroll.disableDown();
+        displayUserPosition--;
+    }
 }
 
 
@@ -162,19 +158,22 @@ static void userInterfaceDisplayUpdate()
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
             displayUserPosition = 0;
-            userInterfaceDisplayReportStateUpdate();
+            userInterfaceDisplayReportStateInit();
             break;
         case DISPLAY_AJUSTES_STATE:
-           userPositionUpdate(); userInterfaceDisplayAjustesStateUpdate();
+            userPositionUpdate(); 
+            userInterfaceDisplayAjustesStateUpdate();
             break;
         case DISPLAY_AJUSTES_SET_DATE_TIME_STATE:
-           userPositionUpdate(); userInterfaceDisplaySetDateTimeStateUpdate();
+            userPositionUpdate(); 
+            userInterfaceDisplaySetDateTimeStateUpdate();
             break;
         case DISPLAY_AJUSTES_RELEASE_FOOD_STATE:
             userInterfaceDisplayReleaseFoodStateUpdate();
             break;
-        case     DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE:
-           userPositionUpdate(); userInterfaceDisplaySetFoodTimesStateUpdate();
+        case DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE:
+            userPositionUpdate(); 
+            userInterfaceDisplaySetFoodTimesStateUpdate();
             break;
         case DISPLAY_AJUSTES_BOWL_TARE_STATE:
             userInterfaceDisplayBowlTareStateUpdate();
@@ -231,7 +230,9 @@ static void userInterfaceDisplayReportStateUpdate()
 {
     if(  scroll.Pressed() ){
         scroll.disablePressed();
+        userInterfaceDisplayAjustesStateInit();
         displayState = DISPLAY_AJUSTES_STATE;
+        displayUserPosition = 0;
         return;
     }
 
@@ -242,7 +243,7 @@ static void userInterfaceDisplayReportStateUpdate()
     time (&rawtime);
     timeinfo = localtime (&rawtime);
     
-    sprintf(lineString, "%d/%d/%d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 + timeinfo->tm_year);
+    sprintf(lineString, "%d/%d/%d ", timeinfo->tm_mday, timeinfo->tm_mon, 1900 + timeinfo->tm_year);
     displayPositionStringWrite ( 0,0 , lineString );   
 
     sprintf(lineString, "%d:%d", timeinfo->tm_hour, timeinfo->tm_min);
@@ -270,17 +271,11 @@ static void userInterfaceDisplayReportStateUpdate()
 }
 
 // DISPLAY EN AJUSTES
-static void userInterfaceDisplayAjustesStateInit()
+static void userInterfaceDisplayAjustesStateUpdate()
 {
-    displayState = DISPLAY_AJUSTES_STATE;
     displayRefreshTimeMs = display_fast_refresh_time;
 
     displayClear();
-    displayUserPosition = 0;
-}
-
-static void userInterfaceDisplayAjustesStateUpdate()
-    {
     if( displayUserPosition > 6) 
         displayUserPosition = 6;
     else if( displayUserPosition < 0)
@@ -291,8 +286,12 @@ static void userInterfaceDisplayAjustesStateUpdate()
         if ( displayUserPosition == 0 ){
             displayState = DISPLAY_REPORT_STATE;
         }
-        else
+        else{
             displayState =  ( displayState_t ) displayUserPosition;
+            displayClear();
+            if( displayUserPosition != 5 )
+            displayUserPosition = 0;
+        }
         return;
         }
     
@@ -300,23 +299,23 @@ static void userInterfaceDisplayAjustesStateUpdate()
         switch( displayUserPosition )
         {
         case 0: case 1:case 2:case 3:
-            sprintf(ajustesString, " Volver  AJUSTES");
+            sprintf(ajustesString, " Volver  AJUSTES    ");
             displayPositionStringWrite ( 0,0 , ajustesString );
         
-            sprintf(ajustesString, " Cambiar fecha/hora");
+            sprintf(ajustesString, " Cambiar fecha/hora ");
             displayPositionStringWrite ( 0,1 , ajustesString );
             
-            sprintf(ajustesString, " Liberar alimento");
+            sprintf(ajustesString, " Liberar alimento   ");
             displayPositionStringWrite ( 0,2 , ajustesString );
             
-            sprintf(ajustesString, " Programar horario");
+            sprintf(ajustesString, " Programar horario  ");
             displayPositionStringWrite ( 0,3 , ajustesString );
             
             set_user_cursor( displayUserPosition );    
         break;
         default:
             displayClear();
-            sprintf(ajustesString, " Tara de bowl");
+            sprintf(ajustesString, " Tara de bowl       ");
             displayPositionStringWrite ( 0,0 , ajustesString );
 
             sprintf(ajustesString, "Alarma almacen.");
@@ -332,13 +331,52 @@ static void userInterfaceDisplayAjustesStateUpdate()
 }
 
 // DISPLAY en cambiar fecha y hora
-static void userInterfaceDisplaySetDateTimeStateInit()
-{
-    displayState = DISPLAY_AJUSTES_SET_DATE_TIME_STATE;
-    displayRefreshTimeMs = display_fast_refresh_time;
-    displayClear();
-}
 
+static void userInterfaceDisplaySetDateTimeStateUpdate()
+{
+    if( displayUserPosition > 3) 
+        displayUserPosition = 3;
+    else if( displayUserPosition < 1)
+        displayUserPosition = 1;
+
+    
+    time_t rawtime;
+    time (&rawtime);
+    struct tm * timeinfo;
+    timeinfo = localtime (&rawtime);
+    char setDateTimeString[21] = "";
+
+    sprintf(setDateTimeString, "Cambiar fecha/hora  ");
+    displayPositionStringWrite ( 0,0 , setDateTimeString );
+
+    sprintf(setDateTimeString, " Fecha    %d/$d/%d  ", timeinfo->tm_mday, timeinfo->tm_mon, 1900 + timeinfo->tm_year);
+    displayPositionStringWrite ( 0,1 , setDateTimeString );
+
+    sprintf(setDateTimeString, " Hora     %d:%d     ", timeinfo->tm_hour, timeinfo->tm_min);
+    displayPositionStringWrite ( 0,2 , setDateTimeString );
+
+    sprintf(setDateTimeString, "              Listo ");
+    displayPositionStringWrite ( 0,3 , setDateTimeString );
+
+    set_user_cursor( displayUserPosition );
+
+    if(  scroll.Pressed() ){
+        scroll.disablePressed();
+        switch ( displayUserPosition ){
+        case 3: 
+            displayState = DISPLAY_AJUSTES_STATE;
+        break;
+        case 2:    
+            displayState = DISPLAY_AJUSTES_SET_ACTUAL_TIME_STATE;
+            settingTimeState = HOUR_STATE;
+        break;
+        case 1:
+            settingDateState = YEAR_STATE;
+            displayState = DISPLAY_AJUSTES_SET_ACTUAL_DATE_STATE;
+        break;
+        }
+    }
+}
 
 static void displaySetDateState()
 {
@@ -396,7 +434,7 @@ static void displaySetDateState()
     break;
     }
     set_time( mktime( rtcTime ) );
-    sprintf(setDateString, "Fecha   * %d/$d/%d", rtcTime -> tm_mday, rtcTime -> tm_mon, 1900 + rtcTime -> tm_year);
+    sprintf(setDateString, "Fecha   * %d/$d/%d  ", rtcTime -> tm_mday, rtcTime -> tm_mon, 1900 + rtcTime -> tm_year);
     displayPositionStringWrite ( 0,1 , setDateString );    
 }
 
@@ -441,80 +479,26 @@ static void displaySetTimeState()
 
     set_time( mktime( rtcTime ) );
     char setTimeString[21] = "";
-    sprintf(setTimeString, "Hora    * %d:%d", rtcTime -> tm_hour, rtcTime -> tm_min);
+    sprintf(setTimeString, " Hora     %d:%d     ", rtcTime -> tm_hour, rtcTime -> tm_min);
     displayPositionStringWrite ( 0,2 , setTimeString );
 }
 
-static void userInterfaceDisplaySetDateTimeStateUpdate()
-{
-    if( displayUserPosition > 3) 
-        displayUserPosition = 3;
-    else if( displayUserPosition < 1)
-        displayUserPosition = 1;
-
-    
-    time_t rawtime;
-    time (&rawtime);
-    struct tm * timeinfo;
-    timeinfo = localtime (&rawtime);
-    char setDateTimeString[21] = "";
-
-    set_user_cursor( displayUserPosition );
-    sprintf(setDateTimeString, "Cambiar fecha/hora");
-    displayPositionStringWrite ( 0,0 , setDateTimeString );
-
-    sprintf(setDateTimeString, " Fecha    %d/$d/%d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 + timeinfo->tm_year);
-    displayPositionStringWrite ( 0,1 , setDateTimeString );
-
-    sprintf(setDateTimeString, " Hora     %d:%d", timeinfo->tm_hour, timeinfo->tm_min);
-    displayPositionStringWrite ( 0,2 , setDateTimeString );
-
-    sprintf(setDateTimeString, "Listo");
-    displayPositionStringWrite ( 14,3 , setDateTimeString );
-
-    if(  scroll.Pressed() ){
-        scroll.disablePressed();
-        switch ( displayUserPosition ){
-        case 3: 
-            displayState = DISPLAY_AJUSTES_STATE;
-        break;
-        case 2:    
-            displayState = DISPLAY_AJUSTES_SET_ACTUAL_TIME_STATE;
-            settingTimeState = HOUR_STATE;
-        break;
-        case 1:
-            settingDateState = YEAR_STATE;
-            displayState = DISPLAY_AJUSTES_SET_ACTUAL_DATE_STATE;
-        break;
-        }
-    }
-}
 
 // DISPLAY en liberar comida
-static void userInterfaceDisplayReleaseFoodStateInit()
-{
-    displayState = DISPLAY_AJUSTES_RELEASE_FOOD_STATE;
-    displayRefreshTimeMs = display_fast_refresh_time;
-    displayClear();
-
-    displayUserPosition = 0;
-    
-    char releaseFoodString[21] = "";
-    sprintf(releaseFoodString, "Liberar alimento");
-    displayPositionStringWrite ( 0,0 , releaseFoodString );
-
-    sprintf(releaseFoodString, "  Gire la perilla");
-    displayPositionStringWrite ( 0,1 , releaseFoodString );
-
-    sprintf(releaseFoodString, "Presione para salir");
-    displayPositionStringWrite ( 0,2 , releaseFoodString );
-
-    sprintf(releaseFoodString, "   Peso: %.0f g", get_food_load() );
-    displayPositionStringWrite ( 0,3 , releaseFoodString );
-}
-
 static void userInterfaceDisplayReleaseFoodStateUpdate()
 {
+    displayClear();
+    
+    char releaseFoodString[21] = "";
+    sprintf(releaseFoodString, "Liberar alimento    ");
+    displayPositionStringWrite ( 0,0 , releaseFoodString );
+
+    sprintf(releaseFoodString, "  Gire la perilla   ");
+    displayPositionStringWrite ( 0,1 , releaseFoodString );
+
+    sprintf(releaseFoodString, "Presione para salir ");
+    displayPositionStringWrite ( 0,2 , releaseFoodString );
+
     if(  scroll.Pressed() )
     {
         scroll.disablePressed();
@@ -527,7 +511,6 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
         scroll.disableDown();
     }
     
-    char releaseFoodString[21] = "";
     sprintf(releaseFoodString, "   Peso: %.0f g", get_food_load() );
     displayPositionStringWrite ( 0,3 , releaseFoodString );
 }
@@ -697,7 +680,7 @@ void userInterfaceSetFoodLoad(){
 static void userInterfaceModifyFoodTime( ){
     food_time_t food_time_selected = get_time_for_food( index_food_time_selected );
     switch ( settingFoodTimeState ){
-    case HOUR_STATE:
+    case FOOD_HOUR_STATE:
         displayPositionStringWrite ( 6, index_food_time_selected%4 , "*   spr  Listo" );
         if ( scroll.Up() ) {
             food_time_selected = food_time_selected + (int)(60/FOOD_TIME_MINUTES_INCREMENT); 
@@ -711,12 +694,12 @@ static void userInterfaceModifyFoodTime( ){
         }
         if ( scroll.Pressed() ) {
             scroll.disablePressed();
-            settingFoodTimeState = MINUTE_STATE;
+            settingFoodTimeState = FOOD_MINUTE_STATE;
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
     break;
 
-    case MINUTE_STATE:
+    case FOOD_MINUTE_STATE:
         displayPositionStringWrite ( 6, index_food_time_selected%4 , "*   spr  Listo" );
         if ( scroll.Up() ) {
             food_time_selected = food_time_selected + FOOD_TIME_MINUTES_INCREMENT; 
@@ -734,24 +717,24 @@ static void userInterfaceModifyFoodTime( ){
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
     break;
     case ASK_DELETE_TIME_STATE:
-         displayPositionStringWrite ( 6, index_food_time_selected%4 , "   *spr  Listo" );
-         if ( scroll.Pressed() ) {
-           delete_food_time();
-           displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
-         }
-         else if( scroll.Up() ) {
-           settingFoodTimeState = ASK_OK_TIME_STATE;
-         }
+        displayPositionStringWrite ( 6, index_food_time_selected%4 , "   *spr  Listo" );
+        if ( scroll.Pressed() ) {
+            delete_food_time_in_position( index_food_time_selected );
+            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+        }
+        else if( scroll.Up() ) {
+            settingFoodTimeState = ASK_OK_TIME_STATE;
+        }
         
     break;
     case ASK_OK_TIME_STATE:
-         displayPositionStringWrite ( 6, index_food_time_selected%4 , "    spr *Listo" );
-         if ( scroll.Pressed() ) {
-           displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
-         }
-         else if( scroll.Down() ) {
-           settingFoodTimeState = ASK_DELETE_TIME_STATE;
-         }
+        displayPositionStringWrite ( 6, index_food_time_selected%4 , "    spr *Listo" );
+        if ( scroll.Pressed() ) {
+            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+        }
+        else if( scroll.Down() ) {
+            settingFoodTimeState = ASK_DELETE_TIME_STATE;
+        }
     break;
     }
 
@@ -764,30 +747,27 @@ static void userInterfaceModifyFoodTime( ){
 
 
 // DISPLAY en establecer tara del bowl
-static void userInterfaceDisplayBowlTareStateInit()
+
+
+static void userInterfaceDisplayBowlTareStateUpdate()
 {
     displayState = DISPLAY_AJUSTES_BOWL_TARE_STATE;
-    displayRefreshTimeMs = display_fast_refresh_time;
     displayClear();
 
-    displayUserPosition =0;
     
     char tareBowlString[21] = "";
-    sprintf(tareBowlString, "Tara del bowl");
+    sprintf(tareBowlString, "Tara del bowl       ");
     displayPositionStringWrite ( 0,0 , tareBowlString );
 
     sprintf(tareBowlString, "  Coloque el bowl de");
     displayPositionStringWrite ( 0,1 , tareBowlString );
 
-    sprintf(tareBowlString, " su mascota vacio.");
+    sprintf(tareBowlString, " su mascota vacio.  ");
     displayPositionStringWrite ( 0,2 , tareBowlString );
 
-    sprintf(tareBowlString, "    *Listo");
+    sprintf(tareBowlString, "    *Listo          ");
     displayPositionStringWrite ( 0,3 , tareBowlString );
-}
 
-static void userInterfaceDisplayBowlTareStateUpdate()
-{
     if( scroll.Pressed() ){
         scroll.disablePressed();
         bowl_tare();

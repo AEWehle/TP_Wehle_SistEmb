@@ -54,7 +54,8 @@ typedef enum {
 typedef enum {
     HOUR_STATE,
     MINUTE_STATE,
-    ASK_DELETE_TIME_STATE
+    ASK_DELETE_TIME_STATE,
+    ASK_OK_TIME_STATE
 } setFoodTimeState_t;
 
 //=====[Declaration and initialization of public global objects]===============
@@ -697,7 +698,7 @@ static void userInterfaceModifyFoodTime( ){
     food_time_t food_time_selected = get_time_for_food( index_food_time_selected );
     switch ( settingFoodTimeState ){
     case HOUR_STATE:
-        displayPositionStringWrite ( 6, index_food_time_selected%4 , "*" );
+        displayPositionStringWrite ( 6, index_food_time_selected%4 , "*   spr  Listo" );
         if ( scroll.Up() ) {
             food_time_selected = food_time_selected + (int)(60/FOOD_TIME_MINUTES_INCREMENT); 
             // aumentar 60 minutos
@@ -712,10 +713,11 @@ static void userInterfaceModifyFoodTime( ){
             scroll.disablePressed();
             settingFoodTimeState = MINUTE_STATE;
         }
+        change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
     break;
 
     case MINUTE_STATE:
-        displayPositionStringWrite ( 6, index_food_time_selected%4 , "*" );
+        displayPositionStringWrite ( 6, index_food_time_selected%4 , "*   spr  Listo" );
         if ( scroll.Up() ) {
             food_time_selected = food_time_selected + FOOD_TIME_MINUTES_INCREMENT; 
             scroll.disableUp();
@@ -729,9 +731,10 @@ static void userInterfaceModifyFoodTime( ){
             settingFoodTimeState = ASK_DELETE_TIME_STATE;
             
         }
+        change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
     break;
     case ASK_DELETE_TIME_STATE:
-         displayPositionStringWrite ( 9, index_food_time_selected%4 , "*" );
+         displayPositionStringWrite ( 6, index_food_time_selected%4 , "   *spr  Listo" );
          if ( scroll.Pressed() ) {
            delete_food_time();
            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
@@ -742,7 +745,7 @@ static void userInterfaceModifyFoodTime( ){
         
     break;
     case ASK_OK_TIME_STATE:
-         displayPositionStringWrite ( 14, index_food_time_selected%4 , "*" );
+         displayPositionStringWrite ( 6, index_food_time_selected%4 , "    spr *Listo" );
          if ( scroll.Pressed() ) {
            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
          }
@@ -753,8 +756,8 @@ static void userInterfaceModifyFoodTime( ){
     }
 
     char setTimeString[21] = "";
-    change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-    sprintf(setTimeString, "*%d:%d    spr  Listo", food_time_selected, food_time_selected);
+    
+    sprintf(setTimeString, "*%d:%d", food_time_selected, food_time_selected);
     displayPositionStringWrite ( 0, index_food_time_selected%4 , setTimeString );
 
 }

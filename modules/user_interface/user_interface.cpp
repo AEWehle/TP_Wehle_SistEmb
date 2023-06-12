@@ -129,6 +129,18 @@ static void userInterfaceDisplayInit()
     userInterfaceDisplayReportStateInit();
 }
  
+static void userPositionUpdate ()
+{
+    if ( scroll.Up() ){
+            scroll.disableUp();
+            displayUserPosition++;
+        }
+        else if( scroll.Down() ){
+            scroll.disableDown();
+            displayUserPosition--;
+        }
+}
+
 
 static void userInterfaceDisplayUpdate()
 {
@@ -138,29 +150,22 @@ static void userInterfaceDisplayUpdate()
     if( accumulatedDisplayTime >=
         displayRefreshTimeMs ) { 
 
-        if ( scroll.Up() ){
-            displayUserPosition++;
-        }
-        else if( scroll.Down() ){
-            displayUserPosition--;
-        }
-
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
             displayUserPosition = 0;
             userInterfaceDisplayReportStateUpdate();
             break;
         case DISPLAY_AJUSTES_STATE:
-            userInterfaceDisplayAjustesStateUpdate();
+           userPositionUpdate(); userInterfaceDisplayAjustesStateUpdate();
             break;
         case DISPLAY_AJUSTES_SET_DATE_TIME_STATE:
-            userInterfaceDisplaySetDateTimeStateUpdate();
+           userPositionUpdate(); userInterfaceDisplaySetDateTimeStateUpdate();
             break;
         case DISPLAY_AJUSTES_RELEASE_FOOD_STATE:
             userInterfaceDisplayReleaseFoodStateUpdate();
             break;
         case     DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE:
-            userInterfaceDisplaySetFoodTimesStateUpdate();
+           userPositionUpdate(); userInterfaceDisplaySetFoodTimesStateUpdate();
             break;
         case DISPLAY_AJUSTES_BOWL_TARE_STATE:
             userInterfaceDisplayBowlTareStateUpdate();
@@ -189,7 +194,7 @@ static void userInterfaceDisplayUpdate()
         }
     } else {
         accumulatedDisplayTime =
-            accumulatedDisplayTime + SYSTEM_TIME_UPDATE_MS;
+            accumulatedDisplayTime + SYSTEM_TIME_INCREMENT_MS;
     }
 }
 
@@ -758,7 +763,11 @@ static void userInterfaceDisplayBowlTareStateUpdate()
 }
 
 static void userInterfaceDisplayAlarmStorageStateUpdate(){
-    alarmLowStorageActivation = !alarmLowStorageActivation;
+    if ( scroll.Pressed() ){
+         scroll.disablePressed();
+         alarmLowStorageActivation = !alarmLowStorageActivation;
+         displayState = DISPLAY_AJUSTES_STATE;
+    }
 }
 
 void set_user_cursor( int user_position ){

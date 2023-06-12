@@ -3,6 +3,7 @@
 #include "mbed.h"
 #include "arm_book_lib.h"
 #include "display.h"
+#include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -102,6 +103,8 @@ typedef struct{
 } pcf8574_t;
 
 //=====[Declaration and initialization of public global objects]===============
+
+char lineas[4][21] = {"                    ", "                    ", "                    ","                    "};
 
 DigitalOut displayD0( D0 ); // PG9
 DigitalOut displayD1( D1 ); // PG14
@@ -230,8 +233,21 @@ void displayInit( displayType_t type, displayConnection_t connection )
 
 void displayPositionStringWrite( uint8_t charPositionX, uint8_t charPositionY, const char * str )
 {
+    for(int i = 0; str[i] != '\0' && charPositionX+i < 20; i++){
+        lineas[charPositionY][charPositionX+i] = str[i];
+    }
+
     displayCharPositionWrite (  charPositionX, charPositionY );
     displayStringWrite( str );
+}
+
+void printDisplay(){
+    pcSerialComStringWrite("\n\n\n\n----------------------------\n");
+    for(int i = 0; i < 4; i++){
+        //printf("%s\n", lineas[i]);
+        pcSerialComStringWrite(lineas[i]);
+        pcSerialComStringWrite("\r\n");
+    }
 }
 
 void displayCharPositionWrite( uint8_t charPositionX, uint8_t charPositionY )
@@ -316,6 +332,11 @@ void displayStringWrite( const char * str )
 
 void displayClear( void )
 {
+
+    sprintf(lineas[0], "                    ");
+    sprintf(lineas[1], "                    ");
+    sprintf(lineas[2], "                    ");
+    displayPositionStringWrite ( 0,3 , "                    " );
     displayCodeWrite( DISPLAY_RS_INSTRUCTION, 
                       DISPLAY_IR_CLEAR_DISPLAY );
     delay( 2 ); 

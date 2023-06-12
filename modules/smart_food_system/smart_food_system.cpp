@@ -26,7 +26,7 @@
 
 //=====[Declaration and initialization of private global variables]============
 int time_increment_update;
-const int system_time_update = (int)10/SYSTEM_TIME_INCREMENT_MS;
+const int system_time_update = (int)(SYSTEM_TIME_UPDATE_MS/SYSTEM_TIME_INCREMENT_MS);
 //=====[Declarations (prototypes) of private functions]========================
 
 //=====[Implementations of public functions]===================================
@@ -47,6 +47,7 @@ void smartFoodSystemInit()
     sdCardInit();
     userInterfaceInit();
 }
+// void printDisplay();
 
 void smartFoodSystemUpdate()
 {
@@ -58,8 +59,9 @@ void smartFoodSystemUpdate()
         pcSerialComUpdate();
         eventLogUpdate();
         time_increment_update = 0;
+        // printDisplay();
     }
-    
+    time_increment_update++;
     userInterfaceUpdate();
     delay(SYSTEM_TIME_INCREMENT_MS);
 }

@@ -51,6 +51,12 @@ typedef enum {
     MINUTE_STATE
 } setTimeState_t;
 
+typedef enum {
+    HOUR_STATE,
+    MINUTE_STATE,
+    ASK_DELETE_TIME_STATE
+} setFoodTimeState_t;
+
 //=====[Declaration and initialization of public global objects]===============
 
 Scroll scroll(PE_15, PE_14, PE_12);
@@ -70,6 +76,7 @@ static int index_food_time_selected;
 static displayState_t displayState = DISPLAY_REPORT_STATE;
 static setDateState_t settingDateState = YEAR_STATE;
 static setTimeState_t settingTimeState = HOUR_STATE;
+static setFoodTimeState_t settingFoodTimeState = HOUR_STATE;
 static int displayUserPosition = 0;
 static int displayRefreshTimeMs = display_refresh_time_report;
 bool alarmLowStorageActivation = true;
@@ -79,6 +86,7 @@ bool alarmLowStorageActivation = true;
 // char* strcat( char* str , const char* strcat );
 
 void set_user_cursor( int user_position );
+static void userPositionUpdate ();
 
 static void userInterfaceDisplayInit();
 static void userInterfaceDisplayUpdate();
@@ -687,8 +695,9 @@ void userInterfaceSetFoodLoad(){
 
 static void userInterfaceModifyFoodTime( ){
     food_time_t food_time_selected = get_time_for_food( index_food_time_selected );
-    switch ( settingTimeState ){
+    switch ( settingFoodTimeState ){
     case HOUR_STATE:
+        displayPositionStringWrite ( 6, index_food_time_selected%4 , "*" );
         if ( scroll.Up() ) {
             food_time_selected = food_time_selected + (int)(60/FOOD_TIME_MINUTES_INCREMENT); 
             // aumentar 60 minutos
@@ -701,11 +710,12 @@ static void userInterfaceModifyFoodTime( ){
         }
         if ( scroll.Pressed() ) {
             scroll.disablePressed();
-            settingTimeState = MINUTE_STATE;
+            settingFoodTimeState = MINUTE_STATE;
         }
     break;
 
     case MINUTE_STATE:
+        displayPositionStringWrite ( 6, index_food_time_selected%4 , "*" );
         if ( scroll.Up() ) {
             food_time_selected = food_time_selected + FOOD_TIME_MINUTES_INCREMENT; 
             scroll.disableUp();
@@ -716,15 +726,35 @@ static void userInterfaceModifyFoodTime( ){
         }
         if ( scroll.Pressed() ){
             scroll.disablePressed();
-            settingTimeState = HOUR_STATE;
-            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+            settingFoodTimeState = ASK_DELETE_TIME_STATE;
+            
         }
+    break;
+    case ASK_DELETE_TIME_STATE:
+         displayPositionStringWrite ( 9, index_food_time_selected%4 , "*" );
+         if ( scroll.Pressed() ) {
+           delete_food_time();
+           displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+         }
+         else if( scroll.Up() ) {
+           settingFoodTimeState = ASK_OK_TIME_STATE;
+         }
+        
+    break;
+    case ASK_OK_TIME_STATE:
+         displayPositionStringWrite ( 14, index_food_time_selected%4 , "*" );
+         if ( scroll.Pressed() ) {
+           displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+         }
+         else if( scroll.Down() ) {
+           settingFoodTimeState = ASK_DELETE_TIME_STATE;
+         }
     break;
     }
 
     char setTimeString[21] = "";
     change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-    sprintf(setTimeString, "*%d:%d*", food_time_selected, food_time_selected);
+    sprintf(setTimeString, "*%d:%d    spr  Listo", food_time_selected, food_time_selected);
     displayPositionStringWrite ( 0, index_food_time_selected%4 , setTimeString );
 
 }

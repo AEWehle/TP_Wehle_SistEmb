@@ -308,7 +308,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
             sprintf(ajustesString, " Liberar alimento   ");
             displayPositionStringWrite ( 0,2 , ajustesString );
             
-            sprintf(ajustesString, " Programar horario  ");
+            sprintf(ajustesString, " Programar horarios ");
             displayPositionStringWrite ( 0,3 , ajustesString );
             
             set_user_cursor( displayUserPosition );    
@@ -564,7 +564,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
     char setFoodTimesString[21] = "";
     switch( displayUserPosition ){
     case 0: case 1: case 2: case 3:
-        sprintf(setFoodTimesString, " Volver   HORARIOS");
+        sprintf(setFoodTimesString, " Volver   HORARIOS  ");
         displayPositionStringWrite ( 0,0 , setFoodTimesString );
 
         if( get_food_mode() == CLOSED ){

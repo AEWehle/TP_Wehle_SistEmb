@@ -263,10 +263,18 @@ static void userInterfaceDisplayReportStateUpdate()
 //  times for food
     int qtimes = get_times_q();
     int food_time;
-    for (int i = 0 ; i < qtimes && i < 4 ; i++){
+    int actual_time_number = timeinfo->tm_hour * (int)(60/FOOD_TIME_MINUTES_INCREMENT)  + (int) (timeinfo->tm_min/FOOD_TIME_MINUTES_INCREMENT);
+    int inicial = 0;
+    for ( ; inicial < qtimes && inicial < 4 ; i++){
+        food_time = get_time_for_food( inicial );
+        if ( actual_time_number > food_time ) inicial++;
+        else break;
+    }
+    int posicion = 0;
+    for ( int i = inicial ; i < qtimes && posicion < 4 ; i++){
         food_time = get_time_for_food( i );
         sprintf(lineString, "%d:%d", (int) food_time/6, food_time % 6 *60); 
-        displayPositionStringWrite ( 15,i , lineString );
+        displayPositionStringWrite ( 15, posicion++ , lineString );
     }
 }
 

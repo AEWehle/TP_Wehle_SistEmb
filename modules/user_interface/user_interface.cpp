@@ -284,8 +284,8 @@ static void userInterfaceDisplayAjustesStateUpdate()
     displayRefreshTimeMs = display_fast_refresh_time;
 
     displayClear();
-    if( displayUserPosition > 6) 
-        displayUserPosition = 6;
+    if( displayUserPosition > 5) 
+        displayUserPosition = 5;
     else if( displayUserPosition < 0)
         displayUserPosition = 0;
 
@@ -333,7 +333,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
                 strcat(ajustesString, " OFF");
             displayPositionStringWrite ( 1,1 , ajustesString );
 
-            set_user_cursor( displayUserPosition - 5);
+            set_user_cursor( displayUserPosition - 4);
         break;
     }
 }
@@ -526,19 +526,19 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
 // DISPLAY en setear horarios
 static void userInterfaceDisplaySetFoodTimesStateInit()
 {
-    displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
-    displayRefreshTimeMs = display_fast_refresh_time;
-    displayClear();
-    displayUserPosition = 0;
+    
 }
 
 
 
 static void userInterfaceDisplaySetFoodTimesStateUpdate()
 {
+    displayRefreshTimeMs = display_fast_refresh_time;
+    displayClear();
+    
     int qtimes = get_times_q();
-    if( displayUserPosition > 4 + qtimes) 
-        displayUserPosition = 4 + qtimes;
+    if( displayUserPosition > 3 + qtimes) 
+        displayUserPosition = 3 + qtimes;
     else if( displayUserPosition < 0)
         displayUserPosition = 0;    
     
@@ -596,11 +596,11 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
     default:{
         displayClear();
         int food_time;
-        int inicial = (int) displayUserPosition/4;
-        for (int i = inicial ; i < qtimes && i < (inicial + 4 ) ; i++){
-            food_time = get_time_for_food( i );
+        int inicial =  displayUserPosition - 4;
+        for (int i = 0 ; i < qtimes && i < 3 ; i++){
+            food_time = get_time_for_food( i + inicial );
             sprintf(setFoodTimesString, " %d:%d", (int) food_time/6, food_time % 6 *60); 
-            displayPositionStringWrite ( 0, i % 4 , setFoodTimesString );
+            displayPositionStringWrite ( 0, i , setFoodTimesString );
         }
         set_user_cursor( displayUserPosition % 4 );
     break;}

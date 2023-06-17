@@ -10,6 +10,7 @@
 #define MINUTE_BOWL  (int)(60000/SYSTEM_TIME_UPDATE_MS)
 #define FOOD_LOAD_LIMIT               1000.0
 #define TOLERANCIA 5
+#define MAX_TIME_RELEASING_FOOD_SECONDS 10 
 
 //=====[Declaration of public data types]======================================
 

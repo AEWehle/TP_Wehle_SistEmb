@@ -9,6 +9,7 @@
 #include "date_and_time.h"
 #include "sd_card.h"
 #include "time_for_food.h"
+// #include "time.h"
 
 // sacar, solo prueba
 // #include "pc_serial_com.h"
@@ -24,11 +25,12 @@
 
 //=====[Declaration and initialization of public global variables]=============
 
+
 const int MAX_TIMES_DAY = (int)(24*60/FOOD_TIME_MINUTES_INCREMENT); 
 // Como FOOD TIME INCREMENT es 10 minutos, es posible expulsar cada 144 veces en un dia
 static int timesIndex = 2;
 // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
-static food_time_t times_for_food[MAX_TIMES_DAY] = { 48 , 120 }; 
+static food_time_t times_for_food[MAX_TIMES_DAY]; 
 // hora =  (número // 6), div entera de 6
 // minutos = (número % 6) *60, el resto*60
 
@@ -48,16 +50,21 @@ bool its_time( char* actual_time );
 //=====[Implementations of public functions]===================================
 
 void timeForFoodInit()
-{    
+{  
+    charging = false;
     // Por default de entrega comida hasta que haya food_load_required en el bowl a las 8hs y a las 20hs
 }
 
 void timeForFoodUpdate()
 {
     //    pcSerialComStringWrite( "time for food update" );
+    time_t rawtime;
+    struct tm * timeinfo;
+    time (&rawtime);
+    timeinfo = localtime (&rawtime);
 
-    char* actual_time = dateAndTimeRead(); //  devuelve "Sun Sep 16 01:03:52 1973\n\0"
-    if( its_time( actual_time ))
+    
+    if( its_time( timeinfo -> tm_hour, timeinfo -> tm_min , timeinfo -> tm_sec ))
     {
         if( !charging )
         {
@@ -69,8 +76,13 @@ void timeForFoodUpdate()
                 bowl_charge( food_load_required - get_food_load() );
                 // a lazo cerrado hay que cargar hasta que haya food load required en el bowl
         }
+        
     }
     else charging = false;
+}
+
+food_time_t hour_min_2_food_number( int hour, int min ){
+    return (food_time_t) (int)( MAX_TIMES_DAY* hour/24 + min);
 }
 
 void set_food_load_required( float new_food_load ){
@@ -105,14 +117,15 @@ int get_time_for_food( int index ){
 }
 
 // devuelve true si actual time es un times_for_food
-bool its_time( char* actual_time )
-{
-    food_time_t time_numer = 
-            char2int( actual_time[11] ) * 10 + char2int( actual_time[12] ) + // (hora*6 +
-            char2int( actual_time[14] ) * 10 + char2int( actual_time[15] ); // + minuto)
-    for( int i = 0; i < timesIndex ; i++){
-        if ( time_numer == times_for_food[i] ) 
-            return true;
+bool its_time( int hour, int min, int seconds )
+{   
+    if ( seconds == 0 ){
+        food_time_t time_numer = hour * 6 + min;
+
+        for( int i = 0; i < timesIndex ; i++){
+            if ( time_numer == times_for_food[i] ) 
+                return true;
+        }
     }
     return false;
 }
@@ -168,6 +181,8 @@ void delete_food_time( food_time_t bad_time )
         else if ( found )
         times_for_food[ i ] = times_for_food[i+1];
     }
+    if( found )
+        timesIndex--;
 }
 
 
@@ -177,6 +192,7 @@ void delete_food_time_in_position( int bad_time_position )
     {
         times_for_food[ i ] = times_for_food[i+1];
     }
+    timesIndex--;
 }
 
 

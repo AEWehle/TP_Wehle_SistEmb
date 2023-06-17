@@ -10,6 +10,7 @@ typedef int food_time_t;
 
 #define FOOD_TIME_MINUTES_INCREMENT 10
 
+
 typedef enum {
     CLOSED,
     OPEN
@@ -21,6 +22,8 @@ typedef enum {
 
 void timeForFoodInit();
 void timeForFoodUpdate();
+
+food_time_t hour_min_2_food_number( int hour, int min );
 
 int get_times_q();
 int get_time_for_food( int index );
@@ -38,6 +41,7 @@ void change_to_food_mode( loop_mode_t newMode );
 void change2_open_mode();
 void change2_closed_mode();
 
+bool its_time( int hour, int min , int seconds );
 
 int char2int( char the_char );
 //=====[#include guards - end]=================================================

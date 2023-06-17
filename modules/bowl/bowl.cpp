@@ -27,12 +27,18 @@ HX711 balanza(DOUT, CLK);
 //=====[Declaration and initialization of private global variables]============
 
 static bool chargingState = OFF;
+
 static bool foodIncreasedDetected      = OFF;
 static bool foodDecreasedDetected      = OFF;
+
 static float food_load_required = 100;  // lo establece el usuario
 static float food_load = 0; // en gramos
 static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
+static float init_food_load;
+
 static int time_count_bowl = 0;
+const int max_time_release_food = MAX_TIME_RELEASING_FOOD_SECONDS *1000 / SYSTEM_TIME_UPDATE_MS;
+static int time_count_releasing_food;
 
 //=====[Declarations (prototypes) of private functions]========================
 
@@ -71,13 +77,17 @@ void bowl_calibrate() {
 
 void bowlInit()
 {
+    time_count_releasing_food = 0;
+    chargingState = OFF;
     bowl_tare();
 }
 
 void bowl_charge( float food_to_add ){
     motorActivation();
-    food_load_required = get_food_load() + food_to_add;
+    init_food_load = get_food_load();
+    food_load_required = init_food_load + food_to_add;
     chargingState = ON;
+    time_count_releasing_food = 0;
 }
 
 float get_food_load() {
@@ -87,10 +97,22 @@ float get_food_load() {
 
 void bowlUpdate()
 {
+    if( chargingState ){
+        time_count_releasing_food++;
+    }
+
 // pcSerialComStringWrite( "bowl update" );
-    if( (get_food_load() > food_load_required) && chargingState ){
-        motorDeactivation();
-        chargingState = OFF;
+// supere lo requerido o no se modifico la carga en el bowl me detengo
+    if( chargingState ){
+        if ( ((get_food_load() > food_load_required) 
+        || (time_count_releasing_food >= max_time_release_food) &&  (get_food_load() < init_food_load + 10)) ) {
+            motorDeactivation();
+            chargingState = OFF;
+        }
+        else {
+            init_food_load = get_food_load();
+            time_count_releasing_food = 0;
+        }
     }
 
     time_count_bowl++;

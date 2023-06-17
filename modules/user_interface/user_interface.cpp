@@ -92,10 +92,8 @@ static void userPositionUpdate ();
 static void userInterfaceDisplayInit();
 static void userInterfaceDisplayUpdate();
 
-static void userInterfaceDisplayReportStateInit();
 static void userInterfaceDisplayReportStateUpdate();
 
-static void userInterfaceDisplayAjustesStateInit();
 static void userInterfaceDisplayAjustesStateUpdate();
 
 static void userInterfaceDisplaySetDateTimeStateUpdate();
@@ -130,8 +128,9 @@ void userInterfaceUpdate()
 
 static void userInterfaceDisplayInit()
 {
+    displayModeWrite( DISPLAY_MODE_CHAR );
     displayInit( DISPLAY_TYPE_LCD_HD44780, DISPLAY_CONNECTION_GPIO_4BITS );
-    userInterfaceDisplayReportStateInit();
+    userInterfaceDisplayReportStateUpdate();
 }
  
 static void userPositionUpdate ()
@@ -158,7 +157,7 @@ static void userInterfaceDisplayUpdate()
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
             displayUserPosition = 0;
-            userInterfaceDisplayReportStateInit();
+            userInterfaceDisplayReportStateUpdate();
             break;
         case DISPLAY_AJUSTES_STATE:
             userPositionUpdate(); 
@@ -197,7 +196,7 @@ static void userInterfaceDisplayUpdate()
             userInterfaceModifyFoodTime();
             break;
         default:
-            userInterfaceDisplayReportStateInit();
+            userInterfaceDisplayReportStateUpdate();
             break;
         }
     } else {
@@ -207,14 +206,13 @@ static void userInterfaceDisplayUpdate()
 }
 
 
-static void userInterfaceDisplayReportStateInit()
+ 
+
+
+static void userInterfaceDisplayReportStateUpdate()
 {
     displayState = DISPLAY_REPORT_STATE;
     displayRefreshTimeMs = display_refresh_time_report;
-
-    displayUserPosition = 0;
-    
-    displayModeWrite( DISPLAY_MODE_CHAR );
 
     displayClear();
 
@@ -222,15 +220,10 @@ static void userInterfaceDisplayReportStateInit()
     displayPositionStringWrite ( 0,1 , "Peso:         |  :  " );
     displayPositionStringWrite ( 0,2 , "Alm.          |  :  " );
     displayPositionStringWrite ( 0,3 , "  *Ajustes    |  :  " );
-}
- 
 
-
-static void userInterfaceDisplayReportStateUpdate()
-{
     if(  scroll.Pressed() ){
         scroll.disablePressed();
-        userInterfaceDisplayAjustesStateInit();
+        userInterfaceDisplayAjustesStateUpdate();
         displayState = DISPLAY_AJUSTES_STATE;
         displayUserPosition = 0;
         return;

@@ -60,7 +60,7 @@ typedef enum {
 
 //=====[Declaration and initialization of public global objects]===============
 
-Scroll scroll(PE_15, PE_14, PE_12);
+Scroll scroll(PE_15, PE_14, PE_12); //CLK  DT  SW
 
 //=====[Declaration of external public global variables]=======================
 
@@ -265,7 +265,7 @@ static void userInterfaceDisplayReportStateUpdate()
     int food_time;
     int actual_time_number = timeinfo->tm_hour * (int)(60/FOOD_TIME_MINUTES_INCREMENT)  + (int) (timeinfo->tm_min/FOOD_TIME_MINUTES_INCREMENT);
     int inicial = 0;
-    for ( ; inicial < qtimes && inicial < 4 ; i++){
+    for ( ; inicial < qtimes && inicial < 4 ; inicial++){
         food_time = get_time_for_food( inicial );
         if ( actual_time_number > food_time ) inicial++;
         else break;

@@ -47,7 +47,7 @@ void smartFoodSystemInit()
     sdCardInit();
     userInterfaceInit();
 }
-// void printDisplay();
+void printDisplay();
 
 void smartFoodSystemUpdate()
 {
@@ -59,7 +59,7 @@ void smartFoodSystemUpdate()
         pcSerialComUpdate();
         eventLogUpdate();
         time_increment_update = 0;
-        // printDisplay();
+        printDisplay();
     }
     time_increment_update++;
     userInterfaceUpdate();

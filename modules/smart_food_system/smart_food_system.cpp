@@ -21,6 +21,7 @@
 //=====[Declaration and initialization of public global objects]===============
 
 //=====[Declaration of external public global variables]=======================
+extern bool print_display;
 
 //=====[Declaration and initialization of public global variables]=============
 
@@ -59,10 +60,14 @@ void smartFoodSystemUpdate()
         pcSerialComUpdate();
         eventLogUpdate();
         time_increment_update = 0;
-        printDisplay();
     }
     time_increment_update++;
     userInterfaceUpdate();
+    if(print_display){
+        printDisplay();
+        print_display = false;
+
+    }
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

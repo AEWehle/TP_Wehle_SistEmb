@@ -1,5 +1,5 @@
 #include "Scroll.h"
-
+#include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -12,6 +12,7 @@
 //=====[Declaration of external public global variables]=======================
 
 //=====[Declaration and initialization of public global variables]=============
+bool print_display = false;
 
 //=====[Declaration and initialization of private global variables]============
 
@@ -35,22 +36,23 @@ Scroll::Scroll(DigitalIn CLK_pin, DigitalIn DT_pin, DigitalIn SW_pin): CLK(CLK_p
 void Scroll::Update(){
 	switch ( buttonState ) {
     case HIGH_STATE:
-        if ( !this -> SW.read() ){
-            buttonState = EDGE_STATE;
-        }
-        break;
-    case LOW_STATE:
         if ( this -> SW.read() ){
             buttonState = EDGE_STATE;
         }
         break;
-    case EDGE_STATE:
+    case LOW_STATE:
         if ( !this -> SW.read() ){
+            buttonState = EDGE_STATE;
+        }
+        break;
+    case EDGE_STATE:
+        if ( this -> SW.read() ){
             SWPressed = true;
+            print_display = true;
+            pcSerialComStringWrite( "pressed\r\n" );
             buttonState = LOW_STATE;
         }
         else {
-            SWPressed = false;
             buttonState = HIGH_STATE;
         }
         break;
@@ -73,13 +75,15 @@ void Scroll::Update(){
         {
             if( CLKState != DTState )
             {
-                this -> scrollDown = false;
+                // this -> scrollDown = false;
                 this -> scrollUp = true;  
+                print_display = true;
             }
             else
             {
                 this -> scrollDown = true;                
-                this -> scrollUp = false;
+                // this -> scrollUp = false;
+                print_display = true;
             }
         }          
         scrollState = HIGH_STATE;

@@ -9,6 +9,7 @@
 **/
 
 #include "load_sensorHX711.h"
+#include "pc_serial_com.h"
 
 uint8_t shiftIn(DigitalIn& dataPin, DigitalOut& clockPin, uint8_t bitOrder) {
     uint8_t value = 0;
@@ -56,7 +57,7 @@ void HX711::set_gain(uint8_t gain) {
 long HX711::read() {
 
 	// Wait for the chip to become ready.
-	wait_ready();
+	// wait_ready();
 
 	// Define structures for reading data into.
 	unsigned long value = 0;
@@ -96,6 +97,7 @@ void HX711::wait_ready(unsigned long delay_ms) {
 	// Wait for the chip to become ready.
 	// This is a blocking implementation and will
 	// halt the sketch until a load cell is connected.
+
 	while (!is_ready()) {
 		// Probably will do no harm on AVR but will feed the Watchdog Timer (WDT) on ESP.
 		// https://github.com/bogde/HX711/issues/73

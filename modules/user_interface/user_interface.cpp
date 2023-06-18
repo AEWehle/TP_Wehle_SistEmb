@@ -15,6 +15,7 @@
 #include "time_for_food.h"
 #include "time.h"
 #include "Scroll.h"
+#include "pc_serial_com.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -121,7 +122,7 @@ void userInterfaceInit()
 
 void userInterfaceUpdate()
  {
-// pcSerialComStringWrite( "user interface update" );
+    // pcSerialComStringWrite( "user interface update" );
     scroll.Update();
     userInterfaceDisplayUpdate();
 } 
@@ -156,7 +157,6 @@ static void userInterfaceDisplayUpdate()
 
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
-            displayUserPosition = 0;
             userInterfaceDisplayReportStateUpdate();
             break;
         case DISPLAY_AJUSTES_STATE:
@@ -211,7 +211,6 @@ static void userInterfaceDisplayUpdate()
 
 static void userInterfaceDisplayReportStateUpdate()
 {
-    displayState = DISPLAY_REPORT_STATE;
     displayRefreshTimeMs = display_refresh_time_report;
 
     displayClear();

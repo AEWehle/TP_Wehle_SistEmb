@@ -433,7 +433,9 @@ static void displaySetDateState()
     }
 
     set_time( mktime( rtcTime ) );
-    sprintf(setDateString, "%s%s", " Fecha  ", setDateString);
+    char str_aux[21]= "";
+    sprintf( str_aux, " Fecha  " );
+    sprintf(setDateString, "%s%s", str_aux, setDateString);
     displayPositionStringWrite ( 0,1 , setDateString );    
 }
 
@@ -482,7 +484,9 @@ static void displaySetTimeState()
     }
 
     set_time( mktime( rtcTime ) );
-    sprintf(setTimeString, "%s%s", " Hora   ", setTimeString);
+    char str_aux [21]= "" ;
+    sprintf( str_aux, " Hora   ");
+    sprintf(setTimeString, "%s%s", str_aux, setTimeString);
     displayPositionStringWrite ( 0,2 , setTimeString );
 }
 
@@ -600,7 +604,6 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
 
 static void userInterfaceAddFoodTime(){
     char setTimeString[21] = "";
-    // sprintf(setTimeString, "Nueva Hora *%2d:%.2d ", adding_hour, adding_minute);
 
     switch ( settingTimeState ){
     case HOUR_STATE:{
@@ -644,7 +647,9 @@ static void userInterfaceAddFoodTime(){
     break;}
     }
 
-    sprintf(setTimeString, "%s%s","Nueva Hora ", setTimeString );
+    char str_aux[21] = "" ;
+    sprintf( str_aux, "Nueva Hora " );
+    sprintf(setTimeString, "%s%s", str_aux, setTimeString );
     displayPositionStringWrite ( 0,3 , setTimeString );
 }
 

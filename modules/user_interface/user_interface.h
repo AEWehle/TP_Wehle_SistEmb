@@ -3,6 +3,8 @@
 #ifndef _USER_INTERFACE_H_
 #define _USER_INTERFACE_H_
 
+#include "Scroll.h"
+
 //=====[Declaration of public defines]=========================================
 
 //=====[Declaration of public data types]======================================
@@ -11,6 +13,9 @@
 
 void userInterfaceInit();
 void userInterfaceUpdate();
+void scrollUpdate();
+void downUserPosition();
+void upUserPosition();
 // bool userInterfaceCodeCompleteRead();
 // void userInterfaceCodeCompleteWrite( bool state );
 

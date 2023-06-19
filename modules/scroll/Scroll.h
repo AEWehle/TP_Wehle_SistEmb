@@ -40,7 +40,8 @@ bool Up();
 void disablePressed();
 void disableUp();
 void disableDown();
-
+void enableUp();
+void enableDown();
 };
 
 //=====[#include guards - end]=================================================

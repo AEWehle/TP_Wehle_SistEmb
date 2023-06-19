@@ -12,6 +12,7 @@
 #include "bowl.h"
 #include "food_storage.h"
 #include "time_for_food.h"
+#include "user_interface.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -130,6 +131,7 @@ void pcSerialComUpdate()
     }    
 }
 
+
 static void pcSerialComCommandUpdate( char receivedChar )
 {
     switch (receivedChar) {
@@ -145,6 +147,8 @@ static void pcSerialComCommandUpdate( char receivedChar )
         case 'g': case 'G': commandEventLogSaveToSdCard(); break;
         case 'l': case 'L': commandSdCardListFiles(); break;
         case 'o': case 'O': commandGetFileName(); break;
+        case 'q': case 'Q': downUserPosition(); break;
+        case 'w': case 'W': upUserPosition(); break;
         default: availableCommands(); break;
     } 
 }
@@ -164,6 +168,8 @@ static void availableCommands()
     pcSerialComStringWrite( "Presione 'g' o 'G' para guardar los eventos en la tarjeta SD\r\n" );
     pcSerialComStringWrite( "Presione 'l' o 'L' para listar los archivos en la tarjeta SD\r\n" );
     pcSerialComStringWrite( "Presione 'o' o 'O' para mostar las carpetas en la tarjeta SD\r\n" );
+    pcSerialComStringWrite( "Presione 'q' o 'Q' para BAJAR en display\r\n" );
+    pcSerialComStringWrite( "Presione 'w' o 'W' para SUBIR en display\r\n" );
     pcSerialComStringWrite( "\r\n" );
 }
 

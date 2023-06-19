@@ -42,9 +42,9 @@ FATFileSystem sdCardFileSystem("sd", &sd);
 
 //=====[Implementations of public functions]===================================
 
-bool sdCardInit()
-{
+bool sdCardInit( bool SDenable ){
     pcSerialComStringWrite("Buscando un filesystem en la tarjeta SD... \r\n");
+    if( !SDenable ) return false;
     sdCardFileSystem.mount(&sd);
     DIR *sdCardListOfDirectories = opendir("/sd/");
     if ( sdCardListOfDirectories != NULL ) {

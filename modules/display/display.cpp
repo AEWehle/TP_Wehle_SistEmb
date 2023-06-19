@@ -242,7 +242,7 @@ void displayPositionStringWrite( uint8_t charPositionX, uint8_t charPositionY, c
 }
 
 void printDisplay(){
-    pcSerialComStringWrite("\n\n\n\n----------------------------\n");
+    pcSerialComStringWrite("\n\n\n\n----------------------------\r\n");
     for(int i = 0; i < 4; i++){
         //printf("%s\n", lineas[i]);
         pcSerialComStringWrite(lineas[i]);

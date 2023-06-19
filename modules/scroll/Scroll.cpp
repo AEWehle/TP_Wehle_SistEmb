@@ -36,20 +36,19 @@ Scroll::Scroll(DigitalIn CLK_pin, DigitalIn DT_pin, DigitalIn SW_pin): CLK(CLK_p
 void Scroll::Update(){
 	switch ( buttonState ) {
     case HIGH_STATE:
-        if ( this -> SW.read() ){
-            buttonState = EDGE_STATE;
-        }
-        break;
-    case LOW_STATE:
         if ( !this -> SW.read() ){
             buttonState = EDGE_STATE;
         }
         break;
-    case EDGE_STATE:
+    case LOW_STATE:
         if ( this -> SW.read() ){
+            buttonState = EDGE_STATE;
+        }
+        break;
+    case EDGE_STATE:
+        if ( !this -> SW.read() ){
             SWPressed = true;
             print_display = true;
-            pcSerialComStringWrite( "pressed\r\n" );
             buttonState = LOW_STATE;
         }
         else {
@@ -92,27 +91,33 @@ void Scroll::Update(){
 }
 
 void Scroll::disablePressed(){
-	SWPressed = false;
+	this -> SWPressed = false;
 }
 
 bool Scroll::Pressed(){
-	return SWPressed;
+	return this -> SWPressed;
 }
 
 void Scroll::disableUp(){
-	scrollUp = false;
+	this -> scrollUp = false;
+}
+void Scroll::enableUp(){
+	this -> scrollUp = true;
 }
 
 bool Scroll::Up(){
-	return scrollUp;
+	return this -> scrollUp;
 }
 
 void Scroll::disableDown(){
-	scrollDown = false;
+	this -> scrollDown = false;
+}
+void Scroll::enableDown(){
+	this -> scrollDown = true;
 }
 
 bool Scroll::Down(){
-	return scrollDown;
+	return this -> scrollDown;
 }
 
 // Scroll::~Scroll() {

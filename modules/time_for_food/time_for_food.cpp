@@ -28,7 +28,7 @@
 
 const int MAX_TIMES_DAY = (int)(24*60/FOOD_TIME_MINUTES_INCREMENT); 
 // Como FOOD TIME INCREMENT es 10 minutos, es posible expulsar cada 144 veces en un dia
-static int timesIndex = 2;
+static int timesIndex = 0;
 // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
 static food_time_t times_for_food[MAX_TIMES_DAY]; 
 // hora =  (número // 6), div entera de 6

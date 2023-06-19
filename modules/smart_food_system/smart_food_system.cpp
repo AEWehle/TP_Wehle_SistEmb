@@ -45,10 +45,9 @@ void smartFoodSystemInit()
     motorControlInit();
 
     pcSerialComInit();
-    sdCardInit();
+    sdCardInit( false );
     userInterfaceInit();
 }
-void printDisplay();
 
 void smartFoodSystemUpdate()
 {
@@ -59,15 +58,13 @@ void smartFoodSystemUpdate()
         motorControlUpdate();
         pcSerialComUpdate();
         eventLogUpdate();
+        userInterfaceUpdate();
         time_increment_update = 0;
     }
+    
     time_increment_update++;
-    userInterfaceUpdate();
-    if(print_display){
-        printDisplay();
-        print_display = false;
-
-    }
+    scrollUpdate();
+    
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

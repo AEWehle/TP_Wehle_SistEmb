@@ -12,7 +12,7 @@
 
 //=====[Declarations (prototypes) of public functions]=========================
 
-bool sdCardInit();
+bool sdCardInit( bool yes );
 bool sdCardWriteFile( const char* fileName, const char* writeBuffer );
 bool sdCardListFiles( char* fileNamesBuffer, int fileNamesBufferSize );
 bool sdCardReadFile( const char* fileName, char * readBuffer, int readBufferSize );

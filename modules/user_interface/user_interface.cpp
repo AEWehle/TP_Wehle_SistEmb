@@ -434,9 +434,8 @@ static void displaySetDateState()
 
     set_time( mktime( rtcTime ) );
     char str_aux[21]= "";
-    sprintf( str_aux, " Fecha  " );
-    sprintf(setDateString, "%s%s", str_aux, setDateString);
-    displayPositionStringWrite ( 0,1 , setDateString );    
+    sprintf( str_aux, " Fecha  %s", setDateString);
+    displayPositionStringWrite ( 0,1 , str_aux );    
 }
 
 
@@ -477,6 +476,7 @@ static void displaySetTimeState()
         if ( scroll.Pressed() ){
             scroll.disablePressed();
             settingTimeState = HOUR_STATE;
+            displayUserPosition = 1;
             displayState = DISPLAY_AJUSTES_SET_DATE_TIME_STATE;
         }
         sprintf(setTimeString, "%2d:*%.2d", rtcTime -> tm_hour, rtcTime -> tm_min);
@@ -485,9 +485,8 @@ static void displaySetTimeState()
 
     set_time( mktime( rtcTime ) );
     char str_aux [21]= "" ;
-    sprintf( str_aux, " Hora   ");
-    sprintf(setTimeString, "%s%s", str_aux, setTimeString);
-    displayPositionStringWrite ( 0,2 , setTimeString );
+    sprintf( str_aux, " Hora    %s", setTimeString);
+    displayPositionStringWrite ( 0,2 , str_aux );
 }
 
 
@@ -648,9 +647,8 @@ static void userInterfaceAddFoodTime(){
     }
 
     char str_aux[21] = "" ;
-    sprintf( str_aux, "Nueva Hora " );
-    sprintf(setTimeString, "%s%s", str_aux, setTimeString );
-    displayPositionStringWrite ( 0,3 , setTimeString );
+    sprintf( str_aux, "Nueva Hora %s", setTimeString );
+    displayPositionStringWrite ( 0,3 , str_aux );
 }
 
 

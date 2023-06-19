@@ -10,7 +10,7 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
-DigitalIn infrared(PE_12);
+DigitalIn infrared(PB_10);
 
 //=====[Declaration of external public global variables]=======================
 
@@ -24,7 +24,7 @@ DigitalIn infrared(PE_12);
 
 void infraredSensorInit()
 {
-    infrared.mode(PullDown);
+    infrared.mode(PullUp);
 }
 
 void infraredSensorUpdate()
@@ -33,7 +33,7 @@ void infraredSensorUpdate()
 
 bool infraredSensorRead()
 {
-    return infrared.read();
+    return !infrared.read();
 }
 
 //=====[Implementations of private functions]==================================

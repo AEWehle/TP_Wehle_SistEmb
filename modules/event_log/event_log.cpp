@@ -101,10 +101,12 @@ void eventLogWrite( bool currentState, const char* elementName )
 
     strcat( eventStr, elementName );
     sprintf( eventStr, " %.2f gr.", get_food_load() );
-    if ( getUnderStorageDetectorState() )
-        strcat( eventStr, "Almacenamiento BAJO.");
-    else
-        strcat( eventStr, "Almacenamiento OK.");
+    if ( getStorageState() == LOW_STORAGE){
+        strcat(eventStr, "Almac. BAJO");}
+    else if( getStorageState() == OK_STORAGE){
+        strcat(eventStr, "Almac. OK.");}
+    else{
+        strcat(eventStr, "Almac. VACIO.");}
     
     arrayOfStoredEvents[eventsIndex].seconds = time(NULL);
     strcpy( arrayOfStoredEvents[eventsIndex].typeOfEvent, eventStr );

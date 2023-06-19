@@ -4,8 +4,6 @@
 #include "arm_book_lib.h"
 
 #include "motor.h"
-    // sacar, solo prueba
-// #include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -15,8 +13,7 @@
 
 //=====[Declaration and initialization of public global objects]===============
 
-DigitalInOut motorM1Pin(PF_2);
-DigitalInOut motorM2Pin(PE_3);
+DigitalInOut motorPin(PF_2);
 
 //=====[Declaration of external public global variables]=======================
 
@@ -32,11 +29,9 @@ motorDirection_t motorState;
 
 void motorControlInit()
 {
-    motorM1Pin.mode(OpenDrain);
-    motorM2Pin.mode(OpenDrain);
+    motorPin.mode(OpenDrain);
     
-    motorM1Pin.input();
-    motorM2Pin.input();
+    motorPin.output();
 
     motorState = STOPPED;
 }
@@ -60,14 +55,11 @@ void motorControlUpdate()
 {
             // pcSerialComStringWrite( "motor update" );
     if( motorState == ACTIVE ){
-        motorM1Pin.input();
-        motorM2Pin.input();
-        // motorState = STOPPED;
+        motorPin = HIGH;
+      // motorState = STOPPED;
     }
     else{ // ( motorState == STOPPED )
-        motorM2Pin.input();
-        motorM1Pin.output();
-        motorM1Pin = LOW;
+        motorPin = LOW;
         // motorState = ACTIVE;
     }
 }

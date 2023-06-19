@@ -6,9 +6,10 @@
 #include "bowl.h"
 #include "load_sensorHX711.h"
 #include "motor.h"
+#include "food_storage.h"
 
 // sacar, solo prueba
-// #include "pc_serial_com.h"
+#include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -37,8 +38,8 @@ static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto at
 static float init_food_load;
 
 static int time_count_bowl = 0;
-const int max_time_release_food = MAX_TIME_RELEASING_FOOD_SECONDS *1000 / SYSTEM_TIME_UPDATE_MS;
-static int time_count_releasing_food;
+int initial_time_releasing_food;
+const float SCALE = 7037.0/118; // para un peso de 118g
 
 //=====[Declarations (prototypes) of private functions]========================
 
@@ -47,39 +48,28 @@ static int time_count_releasing_food;
 //=====[Para calibrar la celda de carga]=======================================
 
 void bowl_tare() {
-//   Serial.begin(9600);
-//   balanza.begin(DOUT, CLK);
-//   Serial.print("Lectura del valor del ADC:t");
-//   Serial.println(balanza.read());
-    balanza.read();
-//   Serial.println("No ponga ningún objeto sobre la balanza");
-//   Serial.println("Destarando...");
-    balanza.set_scale(); //La escala por defecto es 1
-    balanza.tare(20);  //El peso actual es considerado Tara.
-    // Serial.println("Coloque un peso conocido:");
+    balanza.set_offset(balanza.get_value(10)); //tare
 }
 
 
 // calibrar escala luego de tara
 void bowl_calibrate() {
-//   Serial.begin(9600);
-//   balanza.begin(DOUT, CLK);
 //   Serial.print("Lectura del valor del ADC:  ");
-//   Serial.println(balanza.read());
-     float test_load = 200; // para medir en gramos probamos en gramos, en este caso 200
-     float scale = balanza.read_average(20)/test_load;
-//   Serial.println("No ponga ningun  objeto sobre la balanza");
-//   Serial.println("Destarando...");
-//   Serial.println("...");
-    balanza.set_scale(scale); // Establecemos la escala
+    // char str[100]="";
+    // sprintf(str,"Lectura del valor del ADC: $d\r\n", balanza.read());
+    // pcSerialComStringWrite(str);
+    // float test_load = 200; // para medir en gramos probamos en gramos, en este caso 200
+    // pcSerialComStringWrite("No ponga ningun objeto sobre la balanza\r\nDestarando..\r\n");
+    // float scale = balanza.read_average(20)/test_load;
 }
 
 
 void bowlInit()
-{
-    time_count_releasing_food = 0;
-    chargingState = OFF;
+{   
+    delay(500);
     bowl_tare();
+    balanza.set_scale(SCALE);
+    chargingState = OFF;
 }
 
 void bowl_charge( float food_to_add ){
@@ -87,36 +77,37 @@ void bowl_charge( float food_to_add ){
     init_food_load = get_food_load();
     food_load_required = init_food_load + food_to_add;
     chargingState = ON;
-    time_count_releasing_food = 0;
+    initial_time_releasing_food = time (NULL);
 }
 
 float get_food_load() {
-    food_load = balanza.get_units(20);
     return food_load;
 }
 
 void bowlUpdate()
 {
-    if( chargingState ){
-        time_count_releasing_food++;
-    }
+    food_load = balanza.get_units(10);
 
-// pcSerialComStringWrite( "bowl update" );
-// supere lo requerido o no se modifico la carga en el bowl me detengo
     if( chargingState ){
-        if ( ((get_food_load() > food_load_required) 
-        || (time_count_releasing_food >= max_time_release_food) &&  (get_food_load() < init_food_load + 10)) ) {
+        if ( time(NULL) >= (MAX_TIME_RELEASING_FOOD_SECONDS + initial_time_releasing_food)){
+            if (food_load < init_food_load + 10) {
+                motorDeactivation();
+                chargingState = OFF;
+                setEmptyStorage();
+            }
+            else {
+                init_food_load = food_load;
+                initial_time_releasing_food = time(NULL);
+            }
+        }
+        if (food_load > food_load_required) {        
             motorDeactivation();
             chargingState = OFF;
-        }
-        else {
-            init_food_load = get_food_load();
-            time_count_releasing_food = 0;
         }
     }
 
     time_count_bowl++;
-    if ( time_count_bowl >= MINUTE_BOWL ){
+    if ( time_count_bowl >= MINUTE_BOWL_SECONDS ){
         time_count_bowl = 0;
 
         if( last_minute_food_load > (food_load * (1 + TOLERANCIA))){

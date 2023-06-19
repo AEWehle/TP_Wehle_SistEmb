@@ -176,11 +176,12 @@ static void availableCommands()
 
 static void commandShowCurrentUnderStorageDetectorState()
 {
-    if (getUnderStorageDetectorState() ) {
-        pcSerialComStringWrite( "Hay poco almacenamiento de comida\r\n");
-    } else {
-        pcSerialComStringWrite( "Hay suficiente almacenamiento de comida\r\n");
-    }    
+    if ( getStorageState() == LOW_STORAGE)
+        pcSerialComStringWrite( "Hay poco almacenamiento de comida.\r\n");
+    else if( getStorageState() == OK_STORAGE)
+        pcSerialComStringWrite( "Hay suficiente almacenamiento de comida.\r\n");
+    else
+        pcSerialComStringWrite( "El almacenamiento de comida está vacío.\r\n");
 }
 
 static void commandShowCurrentFoodLoadState()
@@ -329,7 +330,7 @@ static void commandShowCurrentMotorState()
 {
     switch ( motorStateRead() ) {
         case STOPPED: 
-            pcSerialComStringWrite( "El motor está parado\r\n"); break;
+            pcSerialComStringWrite( "Motor parado\r\n"); break;
         case ACTIVE: 
             pcSerialComStringWrite( "Motor girando.\r\n"); break;
     }

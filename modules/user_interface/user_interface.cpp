@@ -234,15 +234,18 @@ static void userInterfaceDisplayReportStateUpdate()
     sprintf(lineString, "%.2d/%.2d/%.2d %2d:%.2d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 -2000 + timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min);
     displayPositionStringWrite ( 0,0 , lineString );   
 
-    // food load
-    sprintf(lineString, "Peso: %3d g", (int)get_food_load());
+    // food load(
+    sprintf(lineString, "Peso:%3dg", (int)get_food_load());
     displayPositionStringWrite ( 0,1 , lineString );
  
 //  food storage state
-    if ( getUnderStorageDetectorState() )
-        sprintf(lineString, "Almacen BAJO");
-    else{
-        sprintf(lineString, "Almacen   OK");}   
+    if ( getStorageState() == LOW_STORAGE)
+        sprintf(lineString, "Almacen BAJO ");
+    else if( getStorageState() == OK_STORAGE)
+        sprintf(lineString, "Almacen  OK  ");
+    else
+        sprintf(lineString, "Almacen VACIO");
+
     displayPositionStringWrite ( 0,2 , lineString );
  
     displayPositionStringWrite ( 4,3 , "* Ajustes" );

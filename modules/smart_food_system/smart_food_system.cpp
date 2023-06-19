@@ -28,6 +28,7 @@ extern bool print_display;
 //=====[Declaration and initialization of private global variables]============
 int time_increment_update;
 const int system_time_update = (int)(SYSTEM_TIME_UPDATE_MS/SYSTEM_TIME_INCREMENT_MS);
+time_t miTime ;
 //=====[Declarations (prototypes) of private functions]========================
 
 //=====[Implementations of public functions]===================================
@@ -47,17 +48,22 @@ void smartFoodSystemInit()
     pcSerialComInit();
     sdCardInit( false );
     userInterfaceInit();
+    miTime = time(NULL);
 }
 
 void smartFoodSystemUpdate()
 {
-    if( time_increment_update >=  system_time_update ){
+    if( time(NULL) != miTime ){
         timeForFoodUpdate();
         bowlUpdate();
         foodStorageUpdate();
+        eventLogUpdate();
+        miTime = time(NULL);
+    }
+    
+    if( time_increment_update >=  system_time_update ){
         motorControlUpdate();
         pcSerialComUpdate();
-        eventLogUpdate();
         userInterfaceUpdate();
         time_increment_update = 0;
     }

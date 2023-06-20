@@ -7,7 +7,7 @@
 #include "load_sensorHX711.h"
 #include "motor.h"
 #include "food_storage.h"
-#include "siren.h"
+// #include "siren.h"
 
 // sacar, solo prueba
 #include "pc_serial_com.h"
@@ -88,14 +88,12 @@ float get_food_load() {
 void bowlUpdate()
 {
     food_load = balanza.get_units(10);
-    if(sirenStateRead()) sirenStateWrite( OFF );
     if( chargingState ){
         if ( time(NULL) >= (MAX_TIME_RELEASING_FOOD_SECONDS + initial_time_releasing_food)){
             if (food_load < init_food_load + 10) {
                 motorDeactivation();
                 chargingState = OFF;
                 setEmptyStorage();
-                sirenStateWrite( ON );
             }
             else {
                 init_food_load = food_load;

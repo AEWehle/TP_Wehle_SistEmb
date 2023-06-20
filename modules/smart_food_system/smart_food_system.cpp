@@ -56,8 +56,8 @@ void smartFoodSystemUpdate()
 {
     if( time(NULL) != miTime ){
         timeForFoodUpdate();
-        bowlUpdate();
         foodStorageUpdate();
+        bowlUpdate();
         eventLogUpdate();
         miTime = time(NULL);
     }
@@ -65,13 +65,15 @@ void smartFoodSystemUpdate()
     if( time_increment_update >=  system_time_update ){
         motorControlUpdate();
         pcSerialComUpdate();
-        userInterfaceUpdate();
         time_increment_update = 0;
     }
     
+    userInterfaceUpdate();
     time_increment_update++;
     scrollUpdate();
-    sirenUpdate( 500 );
+    buttonsUpdate();
+    if( isAlarmEnable() ) sirenUpdate( 50 );
+    
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

@@ -94,6 +94,10 @@ void Scroll::disablePressed(){
 	this -> SWPressed = false;
 }
 
+void Scroll::enablePressed(){
+	this -> SWPressed = true;
+}
+
 bool Scroll::Pressed(){
 	return this -> SWPressed;
 }

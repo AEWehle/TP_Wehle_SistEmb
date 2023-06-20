@@ -42,6 +42,7 @@ void disableUp();
 void disableDown();
 void enableUp();
 void enableDown();
+void enablePressed();
 };
 
 //=====[#include guards - end]=================================================

@@ -21,7 +21,10 @@
 //=====[Declaration of private defines]========================================
 
 #define DISPLAY_REFRESH_TIME_REPORT_SECONDS 2
-#define DISPLAY_FAST_REFRESH_TIME_SECONDS  1 // para cuando tiene que cambiar según acciones del usuario
+#define DISPLAY_FAST_REFRESH_TIME_SECONDS  1 
+
+// #define DISPLAY_REFRESH_TIME_REPORT_MS 500
+// #define DISPLAY_FAST_REFRESH_TIME_MS  100
 
 //=====[Declaration of private data types]=====================================
 
@@ -61,27 +64,35 @@ typedef enum {
 
 //=====[Declaration and initialization of public global objects]===============
 
-Scroll scroll(PE_15, PE_14, PE_12); //CLK  DT  SW
+Scroll scroll(PD_0, PD_1, PG_0); //CLK  DT  SW
+
+DigitalIn buttonUp(PC_3);
+DigitalIn buttonSW(PF_3);
+DigitalIn buttonDown(PF_5);
+
+
 
 //=====[Declaration of external public global variables]=======================
+
+//=====[Declaration and initialization of public global variables]=============
+
+//=====[Declaration and initialization of private global variables]============
+
 
 const int display_refresh_time_report = DISPLAY_REFRESH_TIME_REPORT_SECONDS;
 const int display_fast_refresh_time = DISPLAY_FAST_REFRESH_TIME_SECONDS;
 
-//=====[Declaration and initialization of public global variables]=============
+// const int display_refresh_time_report = (int) DISPLAY_REFRESH_TIME_REPORT_MS / SYSTEM_TIME_INCREMENT_MS;
+// const int display_fast_refresh_time = (int) DISPLAY_FAST_REFRESH_TIME_MS / SYSTEM_TIME_INCREMENT_MS;
 
-// char codeSequenceFromUserInterface[CODE_NUMBER_OF_KEYS];
-
-//=====[Declaration and initialization of private global variables]============
-
-static int index_food_time_selected = 0;
 static displayState_t displayState = DISPLAY_REPORT_STATE;
 static setDateState_t settingDateState = DAY_STATE;
 static setTimeState_t settingTimeState = HOUR_STATE;
 static setFoodTimeState_t settingFoodTimeState = FOOD_HOUR_STATE;
+
+static int index_food_time_selected = 0;
 static int displayUserPosition = 0;
-static int displayRefreshTimeMs = display_refresh_time_report;
-static bool alarmLowStorageActivation = true;
+static int displayRefreshTimeOption = display_refresh_time_report;
 
 int adding_hour = 0;
 int adding_minute = 0;
@@ -120,16 +131,52 @@ static void userInterfaceDisplayAlarmStorageStateUpdate();
 
 void userInterfaceInit()
 {
-    set_time( time( NULL ) + 50*365*24*60*60);
+    buttonUp.mode(PullUp);
+    buttonDown.mode(PullUp);
+    buttonSW.mode(PullUp);
+    set_time( time( NULL ) + 20*365.25*24*60*60);
     userInterfaceDisplayInit();
 }
 
 void userInterfaceUpdate()
- {
-    // pcSerialComStringWrite( "user interface update" );
-    // scroll.Update();
+{
     userInterfaceDisplayUpdate();
 } 
+
+void buttonsUpdate(){
+    static bool debounceTimeUp = false;
+    static bool debounceTimeDown = false;
+    static bool debounceTimeSW = false;
+
+    if( !buttonUp ) {
+        if ( debounceTimeUp ){
+            debounceTimeUp = false;
+            // pcSerialComStringWrite("Subo");
+            upUserPosition();
+        }
+        else debounceTimeUp = true;
+    }
+    else debounceTimeUp = false;
+
+    if( !buttonDown ) {
+        if ( debounceTimeDown ){
+            debounceTimeDown = false;
+            // pcSerialComStringWrite("Bajo");
+            downUserPosition();
+        }
+        else debounceTimeDown = true;
+    }
+    else debounceTimeDown = false;
+
+    if( !buttonSW ) {
+        if ( debounceTimeSW ){
+            debounceTimeSW = false;
+            pressedUser();
+        }
+        else debounceTimeSW = true;
+    }
+    else debounceTimeSW = false;
+}
 
 static void userInterfaceDisplayInit()
 {
@@ -156,9 +203,10 @@ static void userInterfaceDisplayUpdate()
 {
     static time_t timeAccumDisplay = time(NULL);
         
-    if( time(NULL) >= (timeAccumDisplay + displayRefreshTimeMs) ) { 
+    if( time(NULL) >= (timeAccumDisplay + displayRefreshTimeOption) ) { 
         printDisplay();
         timeAccumDisplay = time(NULL);
+        
 
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
@@ -210,7 +258,7 @@ static void userInterfaceDisplayUpdate()
 
 static void userInterfaceDisplayReportStateUpdate()
 {   static time_t timeAcumReportUpdate = time(NULL);
-    // displayRefreshTimeMs = display_refresh_time_report;
+    // displayRefreshTimeOption = display_refresh_time_report;
     if( time(NULL) >= (timeAcumReportUpdate + display_refresh_time_report) ){
         timeAcumReportUpdate = time(NULL);
     if(  scroll.Pressed() ){
@@ -229,7 +277,7 @@ static void userInterfaceDisplayReportStateUpdate()
     time (&rawtime);
     timeinfo = localtime (&rawtime);
     
-    sprintf(lineString, "%.2d/%.2d/%.2d %2d:%.2d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 -2000 + timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min);
+    sprintf(lineString, "%.2d/%.2d/%2d %2d:%.2d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 -2000 + timeinfo->tm_year, timeinfo->tm_hour, timeinfo->tm_min);
     displayPositionStringWrite ( 0,0 , lineString );   
 
     // food load(
@@ -269,7 +317,7 @@ static void userInterfaceDisplayReportStateUpdate()
 // DISPLAY EN AJUSTES
 static void userInterfaceDisplayAjustesStateUpdate()
 {
-    displayRefreshTimeMs = display_fast_refresh_time;
+    displayRefreshTimeOption = display_fast_refresh_time;
 
     if( displayUserPosition > 5) 
         displayUserPosition = 5;
@@ -316,7 +364,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
             displayPositionStringWrite ( 0,0 , ajustesString );
 
             sprintf(ajustesString, "Alarma almacen.");
-            if( alarmLowStorageActivation )
+            if( isAlarmEnable() )
                 sprintf(ajustesString, "%s  ON", ajustesString );
             else
                 sprintf(ajustesString, "%s OFF", ajustesString );
@@ -331,7 +379,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
 
 static void userInterfaceDisplaySetDateTimeStateUpdate()
 {
-    displayRefreshTimeMs = display_fast_refresh_time;
+    displayRefreshTimeOption = display_fast_refresh_time;
 
     if( displayUserPosition > 3) 
         displayUserPosition = 3;
@@ -496,7 +544,7 @@ static void displaySetTimeState()
 // DISPLAY en liberar comida
 static void userInterfaceDisplayReleaseFoodStateUpdate()
 {    
-    displayRefreshTimeMs = display_fast_refresh_time;
+    displayRefreshTimeOption = display_fast_refresh_time;
 
     char releaseFoodString[21] = "";
     sprintf(releaseFoodString, "Liberar alimento    ");
@@ -527,7 +575,7 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
 // DISPLAY en setear horarios
 static void userInterfaceDisplaySetFoodTimesStateUpdate()
 {
-    displayRefreshTimeMs = display_fast_refresh_time;
+    displayRefreshTimeOption = display_fast_refresh_time;
     
     int qtimes = get_times_q();
     if( displayUserPosition > 3 + qtimes) 
@@ -607,7 +655,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
 
 
 static void userInterfaceAddFoodTime(){
-    displayRefreshTimeMs = 0;
+    displayRefreshTimeOption = 0;
     char setTimeString[21] = "";
 
     switch ( settingTimeState ){
@@ -660,7 +708,7 @@ static void userInterfaceAddFoodTime(){
 
 
 void userInterfaceSetFoodLoad(){
-    displayRefreshTimeMs = 0;
+    displayRefreshTimeOption = 0;
     if( scroll.Up() ) {
         set_food_load_required( get_food_load_required() + 5 );
         scroll.disableUp();
@@ -691,7 +739,7 @@ void userInterfaceSetFoodLoad(){
 }
 
 static void userInterfaceModifyFoodTime( ){
-    displayRefreshTimeMs = 0;
+    displayRefreshTimeOption = 0;
     char setTimeString[21] = "";
     food_time_t food_time_selected = get_time_for_food( index_food_time_selected );
 
@@ -772,7 +820,7 @@ static void userInterfaceModifyFoodTime( ){
 // DISPLAY en establecer tara del bowl
 static void userInterfaceDisplayBowlTareStateUpdate()
 {
-    displayRefreshTimeMs = display_refresh_time_report;
+    displayRefreshTimeOption = display_refresh_time_report;
     displayState = DISPLAY_AJUSTES_BOWL_TARE_STATE;
 
     char tareBowlString[21] = "";
@@ -797,9 +845,10 @@ static void userInterfaceDisplayBowlTareStateUpdate()
 
 static void userInterfaceDisplayAlarmStorageStateUpdate(){
     if ( scroll.Pressed() ){
-         scroll.disablePressed();
-         alarmLowStorageActivation = !alarmLowStorageActivation;
-         displayState = DISPLAY_AJUSTES_STATE;
+        scroll.disablePressed();
+        toggleAlarmEmptyStorage();
+        // alarmLowStorageActivation = !alarmLowStorageActivation;
+        displayState = DISPLAY_AJUSTES_STATE;
     }
 }
 
@@ -817,4 +866,8 @@ void downUserPosition(){
 
 void upUserPosition(){
     scroll.enableUp();
+}
+
+void pressedUser(){
+    scroll.enablePressed();
 }

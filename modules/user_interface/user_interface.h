@@ -16,6 +16,8 @@ void userInterfaceUpdate();
 void scrollUpdate();
 void downUserPosition();
 void upUserPosition();
+void pressedUser();
+void buttonsUpdate();
 // bool userInterfaceCodeCompleteRead();
 // void userInterfaceCodeCompleteWrite( bool state );
 

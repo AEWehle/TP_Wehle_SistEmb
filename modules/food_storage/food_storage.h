@@ -20,6 +20,8 @@ void foodStorageUpdate();
 
 storage_state_t getStorageState();
 void setEmptyStorage();
+void toggleAlarmEmptyStorage();
+bool isAlarmEnable();
 
 //=====[#include guards - end]=================================================
 

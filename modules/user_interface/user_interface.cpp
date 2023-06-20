@@ -20,10 +20,8 @@
 
 //=====[Declaration of private defines]========================================
 
-#define DISPLAY_REFRESH_TIME_REPORT_MS 1000
-#define DISPLAY_FAST_REFRESH_TIME_MS  1000 // para cuando tiene que cambiar según acciones del usuario
-// #define DISPLAY_REFRESH_TIME_REPORT_MS 10
-// #define DISPLAY_FAST_REFRESH_TIME_MS  1 // para cuando tiene que cambiar según acciones del usuario
+#define DISPLAY_REFRESH_TIME_REPORT_SECONDS 2
+#define DISPLAY_FAST_REFRESH_TIME_SECONDS  1 // para cuando tiene que cambiar según acciones del usuario
 
 //=====[Declaration of private data types]=====================================
 
@@ -67,8 +65,8 @@ Scroll scroll(PE_15, PE_14, PE_12); //CLK  DT  SW
 
 //=====[Declaration of external public global variables]=======================
 
-const int display_refresh_time_report =  (int) DISPLAY_REFRESH_TIME_REPORT_MS/ SYSTEM_TIME_UPDATE_MS;
-const int display_fast_refresh_time = (int) DISPLAY_FAST_REFRESH_TIME_MS/ SYSTEM_TIME_UPDATE_MS;
+const int display_refresh_time_report = DISPLAY_REFRESH_TIME_REPORT_SECONDS;
+const int display_fast_refresh_time = DISPLAY_FAST_REFRESH_TIME_SECONDS;
 
 //=====[Declaration and initialization of public global variables]=============
 
@@ -76,7 +74,7 @@ const int display_fast_refresh_time = (int) DISPLAY_FAST_REFRESH_TIME_MS/ SYSTEM
 
 //=====[Declaration and initialization of private global variables]============
 
-static int index_food_time_selected;
+static int index_food_time_selected = 0;
 static displayState_t displayState = DISPLAY_REPORT_STATE;
 static setDateState_t settingDateState = DAY_STATE;
 static setTimeState_t settingTimeState = HOUR_STATE;
@@ -122,13 +120,14 @@ static void userInterfaceDisplayAlarmStorageStateUpdate();
 
 void userInterfaceInit()
 {
+    set_time( time( NULL ) + 50*365*24*60*60);
     userInterfaceDisplayInit();
 }
 
 void userInterfaceUpdate()
  {
     // pcSerialComStringWrite( "user interface update" );
-    scroll.Update();
+    // scroll.Update();
     userInterfaceDisplayUpdate();
 } 
 
@@ -155,13 +154,12 @@ void printDisplay();
 
 static void userInterfaceDisplayUpdate()
 {
-    static int accumulatedDisplayTime = 0;
+    static time_t timeAccumDisplay = time(NULL);
         
-
-    if( accumulatedDisplayTime >=
-        displayRefreshTimeMs ) { 
-
+    if( time(NULL) >= (timeAccumDisplay + displayRefreshTimeMs) ) { 
         printDisplay();
+        timeAccumDisplay = time(NULL);
+
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
             userInterfaceDisplayReportStateUpdate();
@@ -207,14 +205,14 @@ static void userInterfaceDisplayUpdate()
             break;
         }
     }
-    else accumulatedDisplayTime++;
 }
 
 
 static void userInterfaceDisplayReportStateUpdate()
-{
-    displayRefreshTimeMs = display_refresh_time_report;
-
+{   static time_t timeAcumReportUpdate = time(NULL);
+    // displayRefreshTimeMs = display_refresh_time_report;
+    if( time(NULL) >= (timeAcumReportUpdate + display_refresh_time_report) ){
+        timeAcumReportUpdate = time(NULL);
     if(  scroll.Pressed() ){
         scroll.disablePressed();
         userInterfaceDisplayAjustesStateUpdate();
@@ -266,7 +264,7 @@ static void userInterfaceDisplayReportStateUpdate()
         sprintf(lineString, "|%2d:%.2d", (int) food_time/6, food_time % 6 *60); 
         displayPositionStringWrite ( 14, posicion++ , lineString );
     }
-}
+}}
 
 // DISPLAY EN AJUSTES
 static void userInterfaceDisplayAjustesStateUpdate()
@@ -319,9 +317,9 @@ static void userInterfaceDisplayAjustesStateUpdate()
 
             sprintf(ajustesString, "Alarma almacen.");
             if( alarmLowStorageActivation )
-                strcat(ajustesString, "  ON");
+                sprintf(ajustesString, "%s  ON", ajustesString );
             else
-                strcat(ajustesString, " OFF");
+                sprintf(ajustesString, "%s OFF", ajustesString );
             displayPositionStringWrite ( 1,1 , ajustesString );
 
             set_user_cursor( displayUserPosition - 4);
@@ -333,6 +331,8 @@ static void userInterfaceDisplayAjustesStateUpdate()
 
 static void userInterfaceDisplaySetDateTimeStateUpdate()
 {
+    displayRefreshTimeMs = display_fast_refresh_time;
+
     if( displayUserPosition > 3) 
         displayUserPosition = 3;
     else if( displayUserPosition < 1)
@@ -496,6 +496,8 @@ static void displaySetTimeState()
 // DISPLAY en liberar comida
 static void userInterfaceDisplayReleaseFoodStateUpdate()
 {    
+    displayRefreshTimeMs = display_fast_refresh_time;
+
     char releaseFoodString[21] = "";
     sprintf(releaseFoodString, "Liberar alimento    ");
     displayPositionStringWrite ( 0,0 , releaseFoodString );
@@ -605,6 +607,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
 
 
 static void userInterfaceAddFoodTime(){
+    displayRefreshTimeMs = 0;
     char setTimeString[21] = "";
 
     switch ( settingTimeState ){
@@ -657,6 +660,7 @@ static void userInterfaceAddFoodTime(){
 
 
 void userInterfaceSetFoodLoad(){
+    displayRefreshTimeMs = 0;
     if( scroll.Up() ) {
         set_food_load_required( get_food_load_required() + 5 );
         scroll.disableUp();
@@ -687,6 +691,7 @@ void userInterfaceSetFoodLoad(){
 }
 
 static void userInterfaceModifyFoodTime( ){
+    displayRefreshTimeMs = 0;
     char setTimeString[21] = "";
     food_time_t food_time_selected = get_time_for_food( index_food_time_selected );
 
@@ -707,7 +712,7 @@ static void userInterfaceModifyFoodTime( ){
             settingFoodTimeState = FOOD_MINUTE_STATE;
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-        sprintf(setTimeString, "*%2d:%.2d    Spr  Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, "*%2d:%.2d   Supr  Listo", food_time_selected, food_time_selected);
     break;
 
     case FOOD_MINUTE_STATE:
@@ -725,7 +730,7 @@ static void userInterfaceModifyFoodTime( ){
             
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-        sprintf(setTimeString, " %2d:*%.2d   Spr  Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, " %2d:*%.2d  Supr  Listo", food_time_selected, food_time_selected);
     break;
     case ASK_DELETE_TIME_STATE:
         if ( scroll.Pressed() ) {
@@ -733,6 +738,7 @@ static void userInterfaceModifyFoodTime( ){
             displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
             scroll.disablePressed();
             displayClear();
+            return;
         }
         else if( scroll.Up() ) {
             scroll.disableUp();
@@ -742,19 +748,20 @@ static void userInterfaceModifyFoodTime( ){
             scroll.disableDown();
             settingFoodTimeState = FOOD_MINUTE_STATE;
         }
-        sprintf(setTimeString, "*%2d:%.2d   *Spr  Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, "*%2d:%.2d  *Supr  Listo", food_time_selected, food_time_selected);
     break;
     case ASK_OK_TIME_STATE:
         if ( scroll.Pressed() ) {
             displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
             scroll.disablePressed();
             displayClear();
+            return;
         }
         else if( scroll.Down() ) {
             scroll.disableDown();
             settingFoodTimeState = ASK_DELETE_TIME_STATE;
         }
-        sprintf(setTimeString, "*%2d:%.2d    Spr *Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, "*%2d:%.2d   Supr *Listo", food_time_selected, food_time_selected);
     break;
     }
 
@@ -765,6 +772,7 @@ static void userInterfaceModifyFoodTime( ){
 // DISPLAY en establecer tara del bowl
 static void userInterfaceDisplayBowlTareStateUpdate()
 {
+    displayRefreshTimeMs = display_refresh_time_report;
     displayState = DISPLAY_AJUSTES_BOWL_TARE_STATE;
 
     char tareBowlString[21] = "";

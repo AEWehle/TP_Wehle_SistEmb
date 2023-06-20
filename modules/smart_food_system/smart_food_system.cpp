@@ -12,6 +12,7 @@
 #include "bowl.h"
 #include "food_storage.h"
 #include "time_for_food.h"
+#include "siren.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -70,7 +71,7 @@ void smartFoodSystemUpdate()
     
     time_increment_update++;
     scrollUpdate();
-    
+    sirenUpdate( 500 );
     delay(SYSTEM_TIME_INCREMENT_MS);
 }
 

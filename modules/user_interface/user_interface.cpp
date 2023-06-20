@@ -20,11 +20,13 @@
 
 //=====[Declaration of private defines]========================================
 
-#define DISPLAY_REFRESH_TIME_REPORT_SECONDS 2
-#define DISPLAY_FAST_REFRESH_TIME_SECONDS  1 
+// OPCION LENTA
+// #define DISPLAY_REFRESH_TIME_REPORT_SECONDS 2
+// #define DISPLAY_FAST_REFRESH_TIME_SECONDS  1 
 
-// #define DISPLAY_REFRESH_TIME_REPORT_MS 500
-// #define DISPLAY_FAST_REFRESH_TIME_MS  100
+// OPCION  RAPIDA
+#define DISPLAY_REFRESH_TIME_REPORT_MS 500
+#define DISPLAY_FAST_REFRESH_TIME_MS  100
 
 //=====[Declaration of private data types]=====================================
 
@@ -66,11 +68,9 @@ typedef enum {
 
 Scroll scroll(PD_0, PD_1, PG_0); //CLK  DT  SW
 
-DigitalIn buttonUp(PC_3);
+DigitalIn buttonUp(PF_5);
 DigitalIn buttonSW(PF_3);
-DigitalIn buttonDown(PF_5);
-
-
+DigitalIn buttonDown(PC_3);
 
 //=====[Declaration of external public global variables]=======================
 
@@ -78,12 +78,13 @@ DigitalIn buttonDown(PF_5);
 
 //=====[Declaration and initialization of private global variables]============
 
+// OPCION LENTA
+// const int display_refresh_time_report = DISPLAY_REFRESH_TIME_REPORT_SECONDS;  // OPCION LENTA
+// const int display_fast_refresh_time = DISPLAY_FAST_REFRESH_TIME_SECONDS; // OPCION LENTA
 
-const int display_refresh_time_report = DISPLAY_REFRESH_TIME_REPORT_SECONDS;
-const int display_fast_refresh_time = DISPLAY_FAST_REFRESH_TIME_SECONDS;
-
-// const int display_refresh_time_report = (int) DISPLAY_REFRESH_TIME_REPORT_MS / SYSTEM_TIME_INCREMENT_MS;
-// const int display_fast_refresh_time = (int) DISPLAY_FAST_REFRESH_TIME_MS / SYSTEM_TIME_INCREMENT_MS;
+// OPCION RAPIDA
+const int display_refresh_time_report = (int) DISPLAY_REFRESH_TIME_REPORT_MS / SYSTEM_TIME_INCREMENT_MS; // OPCION RAPIDA
+const int display_fast_refresh_time = (int) DISPLAY_FAST_REFRESH_TIME_MS / SYSTEM_TIME_INCREMENT_MS; // OPCION RAPIDA
 
 static displayState_t displayState = DISPLAY_REPORT_STATE;
 static setDateState_t settingDateState = DAY_STATE;
@@ -99,7 +100,6 @@ int adding_minute = 0;
 
 //=====[Declarations (prototypes) of private functions]========================
 
-// char* strcat( char* str , const char* strcat );
 
 void set_user_cursor( int user_position );
 static void userPositionUpdate ();
@@ -134,7 +134,7 @@ void userInterfaceInit()
     buttonUp.mode(PullUp);
     buttonDown.mode(PullUp);
     buttonSW.mode(PullUp);
-    set_time( time( NULL ) + 20*365.25*24*60*60);
+    set_time( time( NULL ) + (int)(53*364.25*24*60*60));
     userInterfaceDisplayInit();
 }
 
@@ -151,7 +151,6 @@ void buttonsUpdate(){
     if( !buttonUp ) {
         if ( debounceTimeUp ){
             debounceTimeUp = false;
-            // pcSerialComStringWrite("Subo");
             upUserPosition();
         }
         else debounceTimeUp = true;
@@ -161,7 +160,6 @@ void buttonsUpdate(){
     if( !buttonDown ) {
         if ( debounceTimeDown ){
             debounceTimeDown = false;
-            // pcSerialComStringWrite("Bajo");
             downUserPosition();
         }
         else debounceTimeDown = true;
@@ -201,12 +199,21 @@ void printDisplay();
 
 static void userInterfaceDisplayUpdate()
 {
-    static time_t timeAccumDisplay = time(NULL);
-        
-    if( time(NULL) >= (timeAccumDisplay + displayRefreshTimeOption) ) { 
-        printDisplay();
-        timeAccumDisplay = time(NULL);
-        
+    // OPCION RAPIDA
+    static int timeAccumDisplay = 0;  // OPCION RAPIDA
+    timeAccumDisplay++;               // OPCION RAPIDA
+    static time_t timeAccumPrintDisplay = time(NULL);// OPCION RAPIDA
+    if( timeAccumDisplay >=  displayRefreshTimeOption){// OPCION RAPIDA
+        timeAccumDisplay = 0;// OPCION RAPIDA
+
+    // static time_t timeAccumDisplay = time(NULL); // OPCION LENTA
+    // if( time(NULL) >= (timeAccumDisplay + displayRefreshTimeOption) ) {  // OPCION LENTA
+    //     timeAccumDisplay = time(NULL);        // OPCION LENTA
+
+        if(timeAccumPrintDisplay != time(NULL)){ // OPCION RAPIDA
+            timeAccumPrintDisplay = time(NULL);  // OPCION RAPIDA
+            printDisplay();
+        }                                        // OPCION RAPIDA
 
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:
@@ -257,9 +264,10 @@ static void userInterfaceDisplayUpdate()
 
 
 static void userInterfaceDisplayReportStateUpdate()
-{   static time_t timeAcumReportUpdate = time(NULL);
-    // displayRefreshTimeOption = display_refresh_time_report;
-    if( time(NULL) >= (timeAcumReportUpdate + display_refresh_time_report) ){
+{   
+    static time_t timeAcumReportUpdate = time(NULL); // OPCION RAPIDA
+    if( time(NULL) >= timeAcumReportUpdate + 2){     // OPCION RAPIDA
+    // if( time(NULL) >= (timeAcumReportUpdate + display_refresh_time_report) ){ // OPCION LENTA
         timeAcumReportUpdate = time(NULL);
     if(  scroll.Pressed() ){
         scroll.disablePressed();
@@ -281,7 +289,7 @@ static void userInterfaceDisplayReportStateUpdate()
     displayPositionStringWrite ( 0,0 , lineString );   
 
     // food load(
-    sprintf(lineString, "Peso:%3dg", (int)get_food_load());
+    sprintf(lineString, "Peso: %4dg", (int)get_food_load());
     displayPositionStringWrite ( 0,1 , lineString );
  
 //  food storage state
@@ -347,7 +355,7 @@ static void userInterfaceDisplayAjustesStateUpdate()
             sprintf(ajustesString, " Volver  AJUSTES");
             displayPositionStringWrite ( 0,0 , ajustesString );
         
-            sprintf(ajustesString, " Cambiar fecha/hora");
+            sprintf(ajustesString, " Cambiar fecha/hora ");
             displayPositionStringWrite ( 0,1 , ajustesString );
             
             sprintf(ajustesString, " Liberar alimento");

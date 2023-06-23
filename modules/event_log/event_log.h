@@ -7,7 +7,7 @@
 
 #define EVENT_LOG_MAX_STORAGE        20
 #define EVENT_HEAD_STR_LENGTH         8
-#define EVENT_LOG_NAME_MAX_LENGTH    30
+#define EVENT_LOG_NAME_MAX_LENGTH    50
 #define DATE_AND_TIME_STR_LENGTH     18
 #define CTIME_STR_LENGTH             25
 #define NEW_LINE_STR_LENGTH           3

@@ -109,7 +109,7 @@ void eventLogWrite( bool currentState, const char* elementName )
         sprintf( eventStr, " %3dg", foodLoad );
     sprintf("%s%s. ", elementName, eventStr);
     if ( getStorageState() == LOW_STORAGE){
-        strcat(eventStr, "Almac. BAJO");}
+        strcat(eventStr, ". Almac. BAJO");}
     else if( getStorageState() == OK_STORAGE){
         strcat(eventStr, "Almac. OK.");}
     else{

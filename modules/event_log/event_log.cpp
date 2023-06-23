@@ -33,7 +33,7 @@ typedef struct systemEvent {
 
 static bool foodIncreasedLastState         = OFF;
 static bool foodDecreasedLastState         = OFF;
-static bool underStorageLastState         = OFF;
+static bool emptyStorageLastState         = OFF;
 static int eventsIndex     = 0;
 static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 
@@ -63,9 +63,9 @@ void eventLogUpdate()
     eventLogElementStateUpdate( foodDecreasedLastState, currentState, "Dismiución de comida a " );
     foodDecreasedLastState = currentState;
 
-    // currentState = gasDetectorStateRead();
-    // eventLogElementStateUpdate( gasLastState, currentState, "GAS_DET" );
-    // gasLastState = currentState;
+    if(getStorageState() == EMPTY_STORAGE) currentState = true;
+    eventLogElementStateUpdate( emptyStorageLastState, currentState, "Comida en bowl " );
+    emptyStorageLastState = currentState;
 
     // currentState = overTemperatureDetectorStateRead();
     // eventLogElementStateUpdate( tempLastState, currentState, "OVER_TEMP" );

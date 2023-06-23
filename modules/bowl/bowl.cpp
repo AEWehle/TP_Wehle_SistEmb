@@ -100,7 +100,7 @@ void bowlUpdate()
                 initial_time_releasing_food = time(NULL);
             }
         }
-        if (food_load > food_load_required) {        
+        if (food_load >= food_load_required) {        
             motorDeactivation();
             chargingState = OFF;
         }

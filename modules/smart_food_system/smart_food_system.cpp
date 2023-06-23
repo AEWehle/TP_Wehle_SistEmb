@@ -72,7 +72,7 @@ void smartFoodSystemUpdate()
     time_increment_update++;
     scrollUpdate();
     buttonsUpdate();
-    if( isAlarmEnable() ) sirenUpdate( 50 );
+    if( isAlarmEnable() ) sirenUpdate( 30 );
     
     delay(SYSTEM_TIME_INCREMENT_MS);
 }

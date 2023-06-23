@@ -38,7 +38,13 @@ void foodStorageInit()
 void foodStorageUpdate()
 {   static time_t storage_accum_time = time(NULL);
 
-    if( sirenStateRead() ) sirenStateWrite( OFF );
+    static bool onAlarm = OFF;
+    if( sirenStateRead() ) {
+        if (onAlarm) {
+            sirenStateWrite( OFF );
+            onAlarm = OFF;}
+        else onAlarm = ON;
+    }
     if ( storageState == EMPTY_STORAGE && isAlarmEnable() ){
         if( time(NULL) >= storage_accum_time + 60*30 ){ // cada 30 miutos suena la alarma de almcenamiento vacio
             sirenStateWrite( ON );
@@ -56,6 +62,7 @@ void foodStorageUpdate()
 
 void setEmptyStorage(){
     storageState = EMPTY_STORAGE;
+    
     if ( isAlarmEnable() ) sirenStateWrite( ON );
 }
 

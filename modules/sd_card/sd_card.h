@@ -6,7 +6,7 @@
 //=====[Declaration of public defines]=========================================
 
 #define SD_CARD_MAX_FILE_LIST       10
-#define SD_CARD_FILENAME_MAX_LENGTH 32
+#define SD_CARD_FILENAME_MAX_LENGTH 15
 
 //=====[Declaration of public data types]======================================
 

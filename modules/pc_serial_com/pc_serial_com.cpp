@@ -134,6 +134,7 @@ void pcSerialComUpdate()
 
 static void pcSerialComCommandUpdate( char receivedChar )
 {
+    pcSerialComStringWrite( "\r\n" );
     switch (receivedChar) {
         case 'a': case 'A': commandShowCurrentUnderStorageDetectorState(); break;
         case 'c': case 'C': commandShowCurrentFoodLoadState(); break;
@@ -167,7 +168,7 @@ static void availableCommands()
     pcSerialComStringWrite( "Presione 'm' o 'M' para mostrar el estado del motor\r\n" );
     pcSerialComStringWrite( "Presione 'g' o 'G' para guardar los eventos en la tarjeta SD\r\n" );
     pcSerialComStringWrite( "Presione 'l' o 'L' para listar los archivos en la tarjeta SD\r\n" );
-    pcSerialComStringWrite( "Presione 'o' o 'O' para mostar las carpetas en la tarjeta SD\r\n" );
+    pcSerialComStringWrite( "Presione 'o' o 'O' para buscar un archivo en la tarjeta SD\r\n" );
     pcSerialComStringWrite( "Presione 'q' o 'Q' para BAJAR en display\r\n" );
     pcSerialComStringWrite( "Presione 'w' o 'W' para SUBIR en display\r\n" );
     pcSerialComStringWrite( "\r\n" );
@@ -205,7 +206,7 @@ static void commandShowReleaseFood()
 static void commandShowBowlTare()
 {
     char str[100] = "";
-    sprintf ( str, "Tara establecida.\n\rSi el bowl no estaba vacío, vacíelo y vuelva a presionar x o X.\r\n");
+    sprintf ( str, "Tara establecida.\n\rSi el bowl no estaba vacío, vacíelo y vuelva a presionar b o B.\r\n");
     pcSerialComStringWrite( str );
     bowl_tare();
 }

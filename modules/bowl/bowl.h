@@ -7,9 +7,9 @@
 
 //=====[Declaration of public defines]=========================================
 
-#define MINUTE_BOWL_SECONDS  60
+#define MINUTE_BOWL_SECONDS  10
 #define FOOD_LOAD_LIMIT               1000.0
-#define TOLERANCIA 5
+#define TOLERANCIA 10
 #define MAX_TIME_RELEASING_FOOD_SECONDS 10
 
 //=====[Declaration of public data types]======================================

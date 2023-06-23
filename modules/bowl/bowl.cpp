@@ -38,7 +38,7 @@ static float food_load = 0; // en gramos
 static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
 static float init_food_load;
 
-static int time_count_bowl = 0;
+// static int time_count_bowl = 0;
 int initial_time_releasing_food;
 const float SCALE = 7037.0/118; // para un peso de 118g
 
@@ -49,7 +49,7 @@ const float SCALE = 7037.0/118; // para un peso de 118g
 //=====[Para calibrar la celda de carga]=======================================
 
 void bowl_tare() {
-    balanza.set_offset(balanza.get_value(10)); //tare
+    balanza.set_offset(balanza.read_average(10)); //tare
 }
 
 
@@ -106,16 +106,16 @@ void bowlUpdate()
         }
     }
 
-    time_count_bowl++;
-    if ( time_count_bowl >= MINUTE_BOWL_SECONDS ){
-        time_count_bowl = 0;
+    static time_t time_count_bowl = time(NULL);
+    if ( time(NULL) >= time_count_bowl + MINUTE_BOWL_SECONDS ){
+        time_count_bowl = time(NULL);
 
-        if( last_minute_food_load > (food_load * (1 + TOLERANCIA))){
+        if( last_minute_food_load > (food_load + TOLERANCIA)){
             foodDecreasedDetected = ON;
             foodIncreasedDetected = OFF;
             last_minute_food_load = food_load;
         }
-        else if( last_minute_food_load < (food_load * (1 - TOLERANCIA))) {
+        else if( last_minute_food_load < (food_load - TOLERANCIA)) {
             foodDecreasedDetected = OFF;
             foodIncreasedDetected = ON;
             last_minute_food_load = food_load;

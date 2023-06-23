@@ -16,10 +16,10 @@
 
 //=====[Declaration of private defines]========================================
 
-#define SPI3_MOSI   PC_12
-#define SPI3_MISO   PC_11
-#define SPI3_SCK    PC_10
-#define SPI3_CS     PA_4_ALT0
+#define SPI3_MOSI   PB_5
+#define SPI3_MISO   PB_4
+#define SPI3_SCK    PB_3
+#define SPI3_CS     PA_4
 
 //=====[Declaration of private data types]=====================================
 

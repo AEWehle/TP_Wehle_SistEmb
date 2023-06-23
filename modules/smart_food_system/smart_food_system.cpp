@@ -47,7 +47,7 @@ void smartFoodSystemInit()
     motorControlInit();
 
     pcSerialComInit();
-    sdCardInit( false );
+    sdCardInit( true );
     userInterfaceInit();
     miTime = time(NULL);
 }

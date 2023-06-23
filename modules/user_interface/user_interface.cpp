@@ -134,7 +134,7 @@ void userInterfaceInit()
     buttonUp.mode(PullUp);
     buttonDown.mode(PullUp);
     buttonSW.mode(PullUp);
-    set_time( time( NULL ) + (int)(53*364.25*24*60*60));
+    set_time( time( NULL ) + (int)(53*365.25*24*60*60));
     userInterfaceDisplayInit();
 }
 
@@ -200,20 +200,25 @@ void printDisplay();
 static void userInterfaceDisplayUpdate()
 {
     // OPCION RAPIDA
-    static int timeAccumDisplay = 0;  // OPCION RAPIDA
-    timeAccumDisplay++;               // OPCION RAPIDA
+    static int timeAccumDisplay = 0;    // OPCION RAPIDA
+    timeAccumDisplay++;                 // OPCION RAPIDA
     static time_t timeAccumPrintDisplay = time(NULL);// OPCION RAPIDA
     if( timeAccumDisplay >=  displayRefreshTimeOption){// OPCION RAPIDA
-        timeAccumDisplay = 0;// OPCION RAPIDA
+        timeAccumDisplay = 0;           // OPCION RAPIDA
 
     // static time_t timeAccumDisplay = time(NULL); // OPCION LENTA
     // if( time(NULL) >= (timeAccumDisplay + displayRefreshTimeOption) ) {  // OPCION LENTA
     //     timeAccumDisplay = time(NULL);        // OPCION LENTA
 
-        if(timeAccumPrintDisplay != time(NULL)){ // OPCION RAPIDA
-            timeAccumPrintDisplay = time(NULL);  // OPCION RAPIDA
-            printDisplay();
-        }                                        // OPCION RAPIDA
+        // if(timeAccumPrintDisplay != time(NULL)){ // OPCION RAPIDA
+        //     timeAccumPrintDisplay = time(NULL);  // OPCION RAPIDA
+        //     printDisplay();
+        // }                                        // OPCION RAPIDA
+        
+        if(timeAccumPrintDisplay >= time(NULL) + 20){ // cada 20 seg limpio display de ruido
+            timeAccumPrintDisplay = time(NULL);
+            displayClear();
+        }
 
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:

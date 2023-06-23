@@ -49,8 +49,12 @@ static void eventLogElementStateUpdate( bool lastState,
 //=====[Implementations of public functions]===================================
 
 void eventLogUpdate()
-{  
-// pcSerialComStringWrite( "event log update" );
+{  static time_t timeEventLog = time(NULL);
+    if (time(NULL) >= timeEventLog + 60){
+        eventLogSaveToSdCard();
+        timeEventLog = time(NULL);
+        pcSerialComStringWrite( "Eventos guardados en la tarjeta SD\r\n" );
+    }
     bool currentState = foodIncreasedStateRead();
     eventLogElementStateUpdate( foodIncreasedLastState, currentState, "Aumento de comida a " );
     foodIncreasedLastState = currentState;
@@ -99,8 +103,8 @@ void eventLogWrite( bool currentState, const char* elementName )
 {
     char eventStr[EVENT_LOG_NAME_MAX_LENGTH] = "";
 
-    strcat( eventStr, elementName );
     sprintf( eventStr, " %.2f gr.", get_food_load() );
+    sprintf("%s%s. ", elementName, eventStr);
     if ( getStorageState() == LOW_STORAGE){
         strcat(eventStr, "Almac. BAJO");}
     else if( getStorageState() == OK_STORAGE){
@@ -134,7 +138,7 @@ bool eventLogSaveToSdCard()
     fileName[0] = '\0';
 
     strftime( fileName, SD_CARD_FILENAME_MAX_LENGTH, 
-              "%Y_%m_%d_%H_%M_%S", localtime(&seconds) );
+              "%Y_%m_%d", localtime(&seconds) );
     strcat( fileName, ".txt" );
 
     for (i = 0; i < eventLogNumberOfStoredEvents(); i++) {

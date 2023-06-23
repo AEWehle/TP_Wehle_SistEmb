@@ -102,8 +102,11 @@ void eventLogRead( int index, char* str )
 void eventLogWrite( bool currentState, const char* elementName )
 {
     char eventStr[EVENT_LOG_NAME_MAX_LENGTH] = "";
-
-    sprintf( eventStr, " %.2f gr.", get_food_load() );
+    int foodLoad = (int)get_food_load();
+    if(foodLoad > 999) 
+        sprintf( eventStr, "+999g");
+    else
+        sprintf( eventStr, " %3dg", foodLoad );
     sprintf("%s%s. ", elementName, eventStr);
     if ( getStorageState() == LOW_STORAGE){
         strcat(eventStr, "Almac. BAJO");}

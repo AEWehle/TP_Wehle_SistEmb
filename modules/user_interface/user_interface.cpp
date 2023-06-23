@@ -26,7 +26,7 @@
 
 // OPCION  RAPIDA
 #define DISPLAY_REFRESH_TIME_REPORT_MS 500
-#define DISPLAY_FAST_REFRESH_TIME_MS  100
+#define DISPLAY_FAST_REFRESH_TIME_MS  200
 
 //=====[Declaration of private data types]=====================================
 
@@ -654,7 +654,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
     default:{
         displayClear();
         int food_time;
-        int inicial =  displayUserPosition - 4;
+        int inicial =  (int)(displayUserPosition/4)*4 - 4;
         for (int i = 0 ; i < qtimes && i < 3 ; i++){
             food_time = get_time_for_food( i + inicial );
             sprintf(setFoodTimesString, " %2d:%.2d", (int) food_time/6, food_time % 6 *60); 
@@ -674,13 +674,13 @@ static void userInterfaceAddFoodTime(){
     switch ( settingTimeState ){
     case HOUR_STATE:{
         if ( scroll.Up() ) {
-            if( adding_hour < 59 )
-                adding_hour++; // aumentar una hora
+            if( adding_hour == 23 ) adding_hour = 0;
+            else    adding_hour++; // aumentar una hora
             scroll.disableUp();
         }
         else if (scroll.Down() ){
-            if( adding_hour > 0 )
-                adding_hour--; // disminuir una hora
+            if( adding_hour == 0 ) adding_hour = 23;
+            else    adding_hour--; // disminuir una hora
             scroll.disableDown();
         }
         if ( scroll.Pressed() ) {
@@ -692,13 +692,13 @@ static void userInterfaceAddFoodTime(){
 
     case MINUTE_STATE:{
         if ( scroll.Up() ) {
-            if( adding_minute < 50)
-                adding_minute = adding_minute + 10; // aumentar
+            if( adding_minute == (60 - FOOD_TIME_MINUTES_INCREMENT)) adding_minute = 0;
+            else    adding_minute = adding_minute + FOOD_TIME_MINUTES_INCREMENT; // aumentar
             scroll.disableUp();
         }
         else if (scroll.Down() ){
-            if(adding_minute > 9 )
-                adding_minute = adding_minute - 10; // disminuir
+            if(adding_minute == 0 ) adding_minute = (60 - FOOD_TIME_MINUTES_INCREMENT);
+            else    adding_minute = adding_minute - FOOD_TIME_MINUTES_INCREMENT; // disminuir
             scroll.disableDown();
         }
         if ( scroll.Pressed() ){

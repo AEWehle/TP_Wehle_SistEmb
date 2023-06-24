@@ -39,9 +39,6 @@ static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 
 //=====[Declarations (prototypes) of private functions]========================
 
-// char* strcat( char* str , const char* strcat );
-// char* strcpy( char* str , const char* strcat );
-
 static void eventLogElementStateUpdate( bool lastState,
                                         bool currentState,
                                         const char* elementName );
@@ -49,39 +46,25 @@ static void eventLogElementStateUpdate( bool lastState,
 //=====[Implementations of public functions]===================================
 
 void eventLogUpdate()
-{  static time_t timeEventLog = time(NULL);
-    if (time(NULL) >= timeEventLog + 60){
-        eventLogSaveToSdCard();
-        timeEventLog = time(NULL);
-        pcSerialComStringWrite( "Eventos guardados en la tarjeta SD\r\n" );
-    }
+{  
+
     bool currentState = foodIncreasedStateRead();
-    eventLogElementStateUpdate( foodIncreasedLastState, currentState, "Aumento de comida a " );
+    eventLogElementStateUpdate( foodIncreasedLastState, currentState, "Aumento comida a " );
     foodIncreasedLastState = currentState;
 
     currentState = foodDecreasedStateRead();
-    eventLogElementStateUpdate( foodDecreasedLastState, currentState, "Dismiución de comida a " );
+    eventLogElementStateUpdate( foodDecreasedLastState, currentState, "Disminuye comida a " );
     foodDecreasedLastState = currentState;
 
-    if(getStorageState() == EMPTY_STORAGE) currentState = true;
+    if(getStorageState() == EMPTY_STORAGE) currentState = ON;
     eventLogElementStateUpdate( emptyStorageLastState, currentState, "Comida en bowl " );
     emptyStorageLastState = currentState;
 
-    // currentState = overTemperatureDetectorStateRead();
-    // eventLogElementStateUpdate( tempLastState, currentState, "OVER_TEMP" );
-    // tempLastState = currentState;
-
-    // currentState = incorrectCodeStateRead();
-    // eventLogElementStateUpdate( ICLastState, currentState, "LED_IC" );
-    // ICLastState = currentState;
-
-    // currentState = systemBlockedStateRead();
-    // eventLogElementStateUpdate( SBLastState ,currentState, "LED_SB" );
-    // SBLastState = currentState;
-
-    // currentState = motionSensorRead();
-    // eventLogElementStateUpdate( motionLastState ,currentState, "MOTION" );
-    // motionLastState = currentState;
+    static time_t timeEventLog = time(NULL);
+    if (time(NULL) >= timeEventLog + 60){
+        timeEventLog = time(NULL);
+        eventLogSaveToSdCard();
+    }
 }
 
 int eventLogNumberOfStoredEvents()
@@ -92,31 +75,31 @@ int eventLogNumberOfStoredEvents()
 void eventLogRead( int index, char* str )
 {
     str[0] = '\0';
-    strcat( str, "Evento = " );
-    strcat( str, arrayOfStoredEvents[index].typeOfEvent );
-    strcat( str, "\r\nFecha y hora = " );
-    strcat( str, ctime(&arrayOfStoredEvents[index].seconds) );
-    strcat( str, "\r\n" );
+    // strcat( str, "Evento = " );
+    sprintf(str, "%s%s", str, arrayOfStoredEvents[index].typeOfEvent );
+    // strcat( str, "\r\nFecha y hora = " );
+    sprintf(str, "%s. %s\r\n", str, ctime(&arrayOfStoredEvents[index].seconds) );
 }
 
 void eventLogWrite( bool currentState, const char* elementName )
 {
     char eventStr[EVENT_LOG_NAME_MAX_LENGTH] = "";
+    sprintf(eventStr, "%s", elementName);
+
     int foodLoad = (int)get_food_load();
-    if(foodLoad > 999) 
-        sprintf( eventStr, "+999g");
+    if ( foodLoad > 1500) sprintf( eventStr, "%s+1.5Kg", eventStr);
+    else sprintf( eventStr, "%s%3dg", eventStr, foodLoad );
+
+
+    if ( getStorageState() == LOW_STORAGE )
+        sprintf(eventStr, "%s. Almac. BAJO.", eventStr);
+    else if( getStorageState() == OK_STORAGE )
+        sprintf(eventStr, "%s. Almac. OK.", eventStr);
     else
-        sprintf( eventStr, " %3dg", foodLoad );
-    sprintf("%s%s. ", elementName, eventStr);
-    if ( getStorageState() == LOW_STORAGE){
-        strcat(eventStr, ". Almac. BAJO");}
-    else if( getStorageState() == OK_STORAGE){
-        strcat(eventStr, "Almac. OK.");}
-    else{
-        strcat(eventStr, "Almac. VACIO.");}
+        sprintf(eventStr, "%s. Almac. VACIO.", eventStr);
     
     arrayOfStoredEvents[eventsIndex].seconds = time(NULL);
-    strcpy( arrayOfStoredEvents[eventsIndex].typeOfEvent, eventStr );
+    sprintf( arrayOfStoredEvents[eventsIndex].typeOfEvent, "%s", eventStr );
     arrayOfStoredEvents[eventsIndex].storedInSd = false;
     if ( eventsIndex < EVENT_LOG_MAX_STORAGE - 1 ) {
         eventsIndex++;
@@ -142,27 +125,27 @@ bool eventLogSaveToSdCard()
 
     strftime( fileName, SD_CARD_FILENAME_MAX_LENGTH, 
               "%Y_%m_%d", localtime(&seconds) );
-    strcat( fileName, ".txt" );
-
+    sprintf( fileName, "%s.txt" ,fileName);
+    
     for (i = 0; i < eventLogNumberOfStoredEvents(); i++) {
         if ( !arrayOfStoredEvents[i].storedInSd ) {
             eventLogRead( i, eventStr );
             if ( sdCardWriteFile( fileName, eventStr ) ){
                 arrayOfStoredEvents[i].storedInSd = true;
-                pcSerialComStringWrite("Guardando evento ");
-                pcSerialComIntWrite(i+1);
-                pcSerialComStringWrite(" en archivo ");
-                pcSerialComStringWrite(fileName);
-                pcSerialComStringWrite("\r\n");
+                // pcSerialComStringWrite("Guardando eventos en archivo ");
+                // pcSerialComIntWrite(i+1);
+                // pcSerialComStringWrite(" 
+                // pcSerialComStringWrite(fileName);
+                // pcSerialComStringWrite("\r\n");
                 eventsStored = true;
             }
         }
     }
 
     if ( eventsStored ) {
-        pcSerialComStringWrite("Nuevos eventos guardados correctamente en la tarjeta SD\r\n\r\n");
-    } else {
-        pcSerialComStringWrite("No hay eventos para guardar en la tarjeta SD\r\n\r\n");
+        pcSerialComStringWrite("Guardando eventos en archivo ");
+        pcSerialComStringWrite(fileName);
+        pcSerialComStringWrite("\r\n");
     }
 
     return true;

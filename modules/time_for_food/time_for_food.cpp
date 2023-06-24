@@ -9,10 +9,6 @@
 #include "date_and_time.h"
 #include "sd_card.h"
 #include "time_for_food.h"
-// #include "time.h"
-
-// sacar, solo prueba
-// #include "pc_serial_com.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -57,7 +53,6 @@ void timeForFoodInit()
 
 void timeForFoodUpdate()
 {
-    //    pcSerialComStringWrite( "time for food update" );
     time_t rawtime;
     struct tm * timeinfo;
     time (&rawtime);

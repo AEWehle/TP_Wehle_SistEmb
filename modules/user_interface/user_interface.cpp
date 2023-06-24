@@ -134,7 +134,7 @@ void userInterfaceInit()
     buttonUp.mode(PullUp);
     buttonDown.mode(PullUp);
     buttonSW.mode(PullUp);
-    set_time( time( NULL ) + (int)(53*365.25*24*60*60));
+    set_time( (int)(53*364*24*60*60) );
     userInterfaceDisplayInit();
 }
 
@@ -417,7 +417,8 @@ static void userInterfaceDisplaySetDateTimeStateUpdate()
 
     sprintf(setDateTimeString, "Listo");
     displayPositionStringWrite ( 14,3 , setDateTimeString );
-
+    
+    displayPositionStringWrite ( 0,3 , " " );
     set_user_cursor( displayUserPosition );
 
     if(  scroll.Pressed() ){
@@ -582,7 +583,7 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
     }
     
     sprintf(releaseFoodString, "Peso: %3d g", (int)get_food_load() );
-    displayPositionStringWrite ( 2,3 , releaseFoodString );
+    displayPositionStringWrite ( 0,3 , releaseFoodString );
 }
 
 // DISPLAY en setear horarios

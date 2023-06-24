@@ -38,7 +38,6 @@ static float food_load = 0; // en gramos
 static float last_minute_food_load = 0; // en gramos el peso de hace 1 minuto atras
 static float init_food_load;
 
-// static int time_count_bowl = 0;
 int initial_time_releasing_food;
 const float SCALE = 7037.0/118; // para un peso de 118g
 

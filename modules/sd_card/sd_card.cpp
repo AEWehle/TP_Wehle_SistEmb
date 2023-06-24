@@ -78,6 +78,25 @@ bool sdCardWriteFile( const char* fileName, const char* writeBuffer )
     }
 }
 
+bool sdCardCreateWriteFile( const char* fileName, const char* writeBuffer )
+{
+    char fileNameSD[SD_CARD_FILENAME_MAX_LENGTH+4] = "";
+    
+    fileNameSD[0] = '\0';
+    strcat( fileNameSD, "/sd/" );
+    strcat( fileNameSD, fileName );
+
+    FILE *sdCardFilePointer = fopen( fileNameSD, "w" );
+
+    if ( sdCardFilePointer != NULL ) {
+        fprintf( sdCardFilePointer, "%s", writeBuffer );                       
+        fclose( sdCardFilePointer );
+        return true;
+    } else {
+        return false;
+    }
+}
+
 bool sdCardReadFile( const char* fileName, char * readBuffer, int readBufferSize )
 {
     char fileNameSD[SD_CARD_FILENAME_MAX_LENGTH+4] = "";

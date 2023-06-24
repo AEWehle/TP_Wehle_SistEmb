@@ -11,6 +11,7 @@
 #include "sd_card.h"
 #include "bowl.h"
 #include "food_storage.h"
+#include "time_for_food.h"
 
 //=====[Declaration of private defines]========================================
 
@@ -31,9 +32,11 @@ typedef struct systemEvent {
 //=====[Declaration and initialization of private global variables]============
 
 
-static bool foodIncreasedLastState         = OFF;
-static bool foodDecreasedLastState         = OFF;
-static bool emptyStorageLastState         = OFF;
+static bool foodIncreasedLastState          = OFF;
+static bool foodDecreasedLastState          = OFF;
+static bool emptyStorageLastState           = OFF;
+static bool save_times_in_SD_last_state     = OFF;
+
 static int eventsIndex     = 0;
 static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 
@@ -59,6 +62,10 @@ void eventLogUpdate()
     if(getStorageState() == EMPTY_STORAGE) currentState = ON;
     eventLogElementStateUpdate( emptyStorageLastState, currentState, "Comida en bowl " );
     emptyStorageLastState = currentState;
+
+    currentState = get_if_save_times_in_SD();
+    times_in_SD_Update( save_times_in_SD_last_state, currentState);
+    foodDecreasedLastState = currentState;
 
     static time_t timeEventLog = time(NULL);
     if (time(NULL) >= timeEventLog + 60){
@@ -132,11 +139,6 @@ bool eventLogSaveToSdCard()
             eventLogRead( i, eventStr );
             if ( sdCardWriteFile( fileName, eventStr ) ){
                 arrayOfStoredEvents[i].storedInSd = true;
-                // pcSerialComStringWrite("Guardando eventos en archivo ");
-                // pcSerialComIntWrite(i+1);
-                // pcSerialComStringWrite(" 
-                // pcSerialComStringWrite(fileName);
-                // pcSerialComStringWrite("\r\n");
                 eventsStored = true;
             }
         }
@@ -158,5 +160,19 @@ static void eventLogElementStateUpdate( bool lastState,
 {
     if ( (lastState == OFF) && (currentState == ON) ) {        
         eventLogWrite( currentState, elementName );       
+    }
+}
+
+static void times_in_SD_Update( bool lastState,
+                                        bool currentState)
+{
+    if ( (lastState == OFF) && (currentState == ON) ) {
+        int qtimes = get_times_q();
+        char times[ MAX_TIMES_DAY * 4 + 2 ];
+        for (int i = 0 ; i < qtimes ; i++){
+            sprintf(times, "%s %3d", times, get_time_for_food( i ) );
+        }
+        sprintf(times, "%s.", times);
+        sdCardCreateWriteFile( "config_time_for_food.txt", times );
     }
 }

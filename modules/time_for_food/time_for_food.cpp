@@ -21,8 +21,8 @@
 
 //=====[Declaration and initialization of public global variables]=============
 
-
-const int MAX_TIMES_DAY = (int)(24*60/FOOD_TIME_MINUTES_INCREMENT); 
+bool save_in_SD = false;
+// const int MAX_TIMES_DAY = (int)(24*60/FOOD_TIME_MINUTES_INCREMENT); 
 // Como FOOD TIME INCREMENT es 10 minutos, es posible expulsar cada 144 veces en un dia
 static int timesIndex = 0;
 // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
@@ -42,12 +42,15 @@ static float food_load_required = FOOD_LOAD_DEFAULT;
 
 void sort_times();
 bool its_time( char* actual_time );
+charge_times_from_SD();
 
 //=====[Implementations of public functions]===================================
 
 void timeForFoodInit()
 {  
     charging = false;
+    charge_times_from_SD();
+    save_in_SD = false;
     // Por default de entrega comida hasta que haya food_load_required en el bowl a las 8hs y a las 20hs
 }
 
@@ -77,7 +80,12 @@ void timeForFoodUpdate()
 }
 
 food_time_t hour_min_2_food_number( int hour, int min ){
-    return (food_time_t) (int)( MAX_TIMES_DAY* hour/24 + min);
+    return (food_time_t) (int)( MAX_TIMES_DAY* hour/24 + min); // max times per day (60/FOOD_TIME_MINUTES_INCREMENT)*hour = number
+}
+
+bool get_if_save_times_in_SD(){
+    save_in_SD = !save_in_SD;
+    return !save_in_SD;
 }
 
 void set_food_load_required( float new_food_load ){
@@ -138,6 +146,7 @@ void add_food_time( food_time_t new_time ){
         times_for_food[timesIndex++]= new_time;
         sort_times();
     }
+    save_in_SD = true;
 }
 
 void add_food_time( int hour, int minute )
@@ -159,10 +168,12 @@ void change_food_time( food_time_t new_time, food_time_t old_time ){
     {
         if ( times_for_food[ i ] == old_time )
         {
-        found = true;
-        times_for_food[i] = new_time;
+            found = true;
+            times_for_food[i] = new_time;
+            save_in_SD = true;
         }
     }
+    if(found) sort_times();
 }
 
 
@@ -176,8 +187,10 @@ void delete_food_time( food_time_t bad_time )
         else if ( found )
         times_for_food[ i ] = times_for_food[i+1];
     }
-    if( found )
+    if( found ){
         timesIndex--;
+        save_in_SD = true;
+    }
 }
 
 
@@ -187,6 +200,7 @@ void delete_food_time_in_position( int bad_time_position )
     {
         times_for_food[ i ] = times_for_food[i+1];
     }
+    save_in_SD = true;
     timesIndex--;
 }
 
@@ -205,3 +219,12 @@ int char2int( char the_char ){
     return number;
 }
 
+void charge_times_from_SD(){
+    char readBuffer[MAX_TIMES_DAY*4 + 2];
+    sdCardReadFile( "config_time_for_food.txt", readBuffer, MAX_TIMES_DAY * 4 + 2 );
+
+    for(int i = 0 ; readBuffer[i] != '.'; i++){
+        add_food_time( char2int( readBuffer[i] )*100 + char2int( readBuffer[i+1] )*10 + char2int( readBuffer[i+2] ) );
+        i = i + 2;
+    }
+}

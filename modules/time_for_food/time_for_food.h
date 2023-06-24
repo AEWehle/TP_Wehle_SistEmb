@@ -9,6 +9,7 @@
 typedef int food_time_t;
 
 #define FOOD_TIME_MINUTES_INCREMENT 10
+#define MAX_TIMES_DAY  ((int)(24*60/FOOD_TIME_MINUTES_INCREMENT)) // less thn 999
 
 
 typedef enum {
@@ -42,6 +43,8 @@ void change2_open_mode();
 void change2_closed_mode();
 
 bool its_time( int hour, int min , int seconds );
+
+bool get_if_save_times_in_SD();
 
 int char2int( char the_char );
 //=====[#include guards - end]=================================================

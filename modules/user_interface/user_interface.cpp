@@ -764,7 +764,7 @@ static void userInterfaceModifyFoodTime( ){
             // aumentar 60 minutos
             scroll.disableUp();
         }
-        else if ( scroll.Down() ){
+        if ( scroll.Down() ){
             food_time_selected = food_time_selected - hour_min_2_food_number( 1 , 0 ); 
             // disminuir 60 minutos
             scroll.disableDown();
@@ -774,7 +774,7 @@ static void userInterfaceModifyFoodTime( ){
             settingFoodTimeState = FOOD_MINUTE_STATE;
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-        sprintf(setTimeString, "*%2d:%.2d   Supr  Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, "*%2d:%.2d  Supr  Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
     break;
 
     case FOOD_MINUTE_STATE:
@@ -792,7 +792,7 @@ static void userInterfaceModifyFoodTime( ){
             
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-        sprintf(setTimeString, " %2d:*%.2d  Supr  Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, " %2d:*%.2d  Supr  Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
     break;
     case ASK_DELETE_TIME_STATE:
         if ( scroll.Pressed() ) {
@@ -810,7 +810,7 @@ static void userInterfaceModifyFoodTime( ){
             scroll.disableDown();
             settingFoodTimeState = FOOD_MINUTE_STATE;
         }
-        sprintf(setTimeString, "*%2d:%.2d  *Supr  Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, " %2d:%.2d  *Supr  Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
     break;
     case ASK_OK_TIME_STATE:
         if ( scroll.Pressed() ) {
@@ -823,7 +823,7 @@ static void userInterfaceModifyFoodTime( ){
             scroll.disableDown();
             settingFoodTimeState = ASK_DELETE_TIME_STATE;
         }
-        sprintf(setTimeString, "*%2d:%.2d   Supr *Listo", food_time_selected, food_time_selected);
+        sprintf(setTimeString, " %2d:%.2d  Supr  *Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
     break;
     }
 

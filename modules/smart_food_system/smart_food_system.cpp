@@ -41,13 +41,13 @@ void smartFoodSystemInit()
 {
     time_increment_update = system_time_update;
     // agregados para el dispenser
+    foodStorageInit();
+    sdCardInit( true );
     timeForFoodInit();
     bowlInit();
-    foodStorageInit();
     motorControlInit();
 
     pcSerialComInit();
-    sdCardInit( true );
     userInterfaceInit();
     miTime = time(NULL);
 }

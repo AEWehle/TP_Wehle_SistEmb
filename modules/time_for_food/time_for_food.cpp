@@ -9,6 +9,7 @@
 #include "date_and_time.h"
 #include "sd_card.h"
 #include "time_for_food.h"
+#include "pc_serial_com.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -28,7 +29,7 @@ static int timesIndex = 0;
 // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
 static food_time_t times_for_food[MAX_TIMES_DAY]; 
 // hora =  (número // 6), div entera de 6
-// minutos = (número % 6) *60, el resto*60
+// minutos = (número % 6) *10, el resto*10
 
 
 //=====[Declaration and initialization of private global variables]============
@@ -42,13 +43,14 @@ static float food_load_required = FOOD_LOAD_DEFAULT;
 
 void sort_times();
 bool its_time( char* actual_time );
-charge_times_from_SD();
+void charge_times_from_SD();
 
 //=====[Implementations of public functions]===================================
 
 void timeForFoodInit()
 {  
     charging = false;
+    pcSerialComStringWrite("Buscando archivo de tiempos\r\n");
     charge_times_from_SD();
     save_in_SD = false;
     // Por default de entrega comida hasta que haya food_load_required en el bowl a las 8hs y a las 20hs
@@ -80,12 +82,15 @@ void timeForFoodUpdate()
 }
 
 food_time_t hour_min_2_food_number( int hour, int min ){
-    return (food_time_t) (int)( MAX_TIMES_DAY* hour/24 + min); // max times per day (60/FOOD_TIME_MINUTES_INCREMENT)*hour = number
+    return (food_time_t) (int)( MAX_TIMES_DAY* hour/24 + min % FOOD_TIME_MINUTES_INCREMENT); // max times per day (60/FOOD_TIME_MINUTES_INCREMENT)*hour = number
 }
 
 bool get_if_save_times_in_SD(){
-    save_in_SD = !save_in_SD;
-    return !save_in_SD;
+    return save_in_SD;
+}
+
+void set_times_saved(){
+    save_in_SD = false;
 }
 
 void set_food_load_required( float new_food_load ){
@@ -214,17 +219,20 @@ void sort_times(){
 int char2int( char the_char ){
     int number = 0;
     if ( the_char >= '0' && the_char <= '9' ){
-        number = (int) the_char - 48;
+        number = (int)( the_char ) - 48;
     }
     return number;
 }
 
 void charge_times_from_SD(){
-    char readBuffer[MAX_TIMES_DAY*4 + 2];
-    sdCardReadFile( "config_time_for_food.txt", readBuffer, MAX_TIMES_DAY * 4 + 2 );
-
-    for(int i = 0 ; readBuffer[i] != '.'; i++){
+    char readBuffer[MAX_TIMES_DAY*4 + 3];
+    if ( sdCardReadFile( "config_time_for_food.txt", readBuffer, MAX_TIMES_DAY * 4 + 3 ) ){
+    char aux[15] = "";
+    for(int i = 0 ; readBuffer[i] != '.' && i < (MAX_TIMES_DAY*4 + 3); ){
         add_food_time( char2int( readBuffer[i] )*100 + char2int( readBuffer[i+1] )*10 + char2int( readBuffer[i+2] ) );
-        i = i + 2;
+        sprintf( aux, "%i:%d\r\n", i/4, char2int( readBuffer[i] )*100 + char2int( readBuffer[i+1] )*10 + char2int( readBuffer[i+2] ) );
+        i += 4;
+        pcSerialComStringWrite( aux );
+    }
     }
 }

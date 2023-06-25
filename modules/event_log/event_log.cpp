@@ -45,7 +45,8 @@ static systemEvent_t arrayOfStoredEvents[EVENT_LOG_MAX_STORAGE];
 static void eventLogElementStateUpdate( bool lastState,
                                         bool currentState,
                                         const char* elementName );
-
+static void times_in_SD_Update( bool lastState,
+                                        bool currentState);
 //=====[Implementations of public functions]===================================
 
 void eventLogUpdate()
@@ -167,12 +168,14 @@ static void times_in_SD_Update( bool lastState,
                                         bool currentState)
 {
     if ( (lastState == OFF) && (currentState == ON) ) {
+        set_times_saved();
         int qtimes = get_times_q();
-        char times[ MAX_TIMES_DAY * 4 + 2 ];
+        char times[ MAX_TIMES_DAY * 4 + 3 ] = "";
         for (int i = 0 ; i < qtimes ; i++){
-            sprintf(times, "%s %3d", times, get_time_for_food( i ) );
+            sprintf(times, "%s%.3d,", times, get_time_for_food( i ) );
         }
         sprintf(times, "%s.", times);
+        pcSerialComStringWrite("Tiempos de comida guardados en SD\r\n");
         sdCardCreateWriteFile( "config_time_for_food.txt", times );
     }
 }

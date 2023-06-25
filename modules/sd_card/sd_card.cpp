@@ -54,7 +54,7 @@ bool sdCardInit( bool SDenable ){
     } else {
         pcSerialComStringWrite("Filesystem no encontrado. \r\n");
         pcSerialComStringWrite("Inserte una tarjeta SD y ");
-        pcSerialComStringWrite("reset la placa.\r\n");
+        pcSerialComStringWrite("reinicie la placa.\r\n");
         return false;
     }
 }
@@ -64,8 +64,7 @@ bool sdCardWriteFile( const char* fileName, const char* writeBuffer )
     char fileNameSD[SD_CARD_FILENAME_MAX_LENGTH+4] = "";
     
     fileNameSD[0] = '\0';
-    strcat( fileNameSD, "/sd/" );
-    strcat( fileNameSD, fileName );
+    sprintf( fileNameSD, "%s/sd/%s", fileNameSD, fileName );
 
     FILE *sdCardFilePointer = fopen( fileNameSD, "a" );
 
@@ -83,8 +82,7 @@ bool sdCardCreateWriteFile( const char* fileName, const char* writeBuffer )
     char fileNameSD[SD_CARD_FILENAME_MAX_LENGTH+4] = "";
     
     fileNameSD[0] = '\0';
-    strcat( fileNameSD, "/sd/" );
-    strcat( fileNameSD, fileName );
+    sprintf( fileNameSD, "%s/sd/%s", fileNameSD, fileName );
 
     FILE *sdCardFilePointer = fopen( fileNameSD, "w" );
 
@@ -103,13 +101,12 @@ bool sdCardReadFile( const char* fileName, char * readBuffer, int readBufferSize
     int i;
     
     fileNameSD[0] = '\0';
-    strcat( fileNameSD, "/sd/" );
-    strcat( fileNameSD, fileName );
+    sprintf( fileNameSD, "%s/sd/%s", fileNameSD, fileName );
     
     FILE *sdCardFilePointer = fopen( fileNameSD, "r" );
     
     if ( sdCardFilePointer != NULL ) {
-        pcSerialComStringWrite( "Opening file: " );
+        pcSerialComStringWrite( "Abriendo archivo: " );
         pcSerialComStringWrite( fileNameSD );
         pcSerialComStringWrite( "\r\n" );
 
@@ -122,7 +119,7 @@ bool sdCardReadFile( const char* fileName, char * readBuffer, int readBufferSize
         fclose( sdCardFilePointer );
         return true;
     } else {
-        pcSerialComStringWrite( "File not found\r\n" );
+        pcSerialComStringWrite( "Archivo no encontrado\r\n" );
         return false;
     }
 }
@@ -135,14 +132,13 @@ bool sdCardListFiles( char* fileNamesBuffer, int fileNamesBufferSize )
     DIR *sdCardListOfDirectories = opendir("/sd/");
 
     if ( sdCardListOfDirectories != NULL ) {
-        pcSerialComStringWrite("Printing all filenames:\r\n");
+        pcSerialComStringWrite("Todos los archivos:\r\n");
         sdCardDirectoryEntryPointer = readdir(sdCardListOfDirectories);
         
         while ( ( sdCardDirectoryEntryPointer != NULL ) && 
                 ( NumberOfUsedBytesInBuffer + strlen(sdCardDirectoryEntryPointer->d_name) < 
                     fileNamesBufferSize) ) {
-            strcat( fileNamesBuffer, sdCardDirectoryEntryPointer->d_name );
-            strcat( fileNamesBuffer, "\r\n" );
+            sprintf( fileNamesBuffer, "%s%s\r\n", fileNamesBuffer, sdCardDirectoryEntryPointer->d_name );
             NumberOfUsedBytesInBuffer = NumberOfUsedBytesInBuffer +
                                         strlen(sdCardDirectoryEntryPointer->d_name);
             sdCardDirectoryEntryPointer = readdir(sdCardListOfDirectories);
@@ -152,8 +148,8 @@ bool sdCardListFiles( char* fileNamesBuffer, int fileNamesBufferSize )
         
         return true;
     } else {
-        pcSerialComStringWrite("Insert an SD card and ");
-        pcSerialComStringWrite("reset the NUCLEO board.\r\n");
+        pcSerialComStringWrite("Ingrese una arjeta SD y ");
+        pcSerialComStringWrite("reinicie la placa.\r\n");
         return false;
     }
 }

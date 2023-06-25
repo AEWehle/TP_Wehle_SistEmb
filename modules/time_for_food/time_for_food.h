@@ -45,6 +45,7 @@ void change2_closed_mode();
 bool its_time( int hour, int min , int seconds );
 
 bool get_if_save_times_in_SD();
+void set_times_saved();
 
 int char2int( char the_char );
 //=====[#include guards - end]=================================================

@@ -322,7 +322,7 @@ static void userInterfaceDisplayReportStateUpdate()
     int posicion = 0;
     for ( int i = inicial ; i < qtimes && posicion < 4 ; i++){
         food_time = get_time_for_food( i );
-        sprintf(lineString, "|%2d:%.2d", (int) food_time/6, food_time % 6 *60); 
+        sprintf(lineString, "|%2d:%.2d", (int) food_time/(60/FOOD_TIME_MINUTES_INCREMENT), food_time % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT); 
         displayPositionStringWrite ( 14, posicion++ , lineString );
     }
 }}
@@ -622,6 +622,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
         break;
         default:{
             index_food_time_selected = displayUserPosition - 4;
+            settingFoodTimeState =  FOOD_HOUR_STATE;            
             displayState = DISPLAY_AJUSTES_MODIFY_FOOD_TIME_STATE;
         break;}
         }
@@ -635,7 +636,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
         displayPositionStringWrite ( 0,0 , setFoodTimesString );
 
         if( get_food_mode() == CLOSED ){
-            sprintf(setFoodTimesString, " Liberar hasta:%3dg", (int)get_food_load_required());
+            sprintf(setFoodTimesString, " Liberar hasta:%3dg ", (int)get_food_load_required());
             displayPositionStringWrite ( 0,1 , setFoodTimesString );
             sprintf(setFoodTimesString, " Liberar siempre:OFF");
             displayPositionStringWrite ( 0,2 , setFoodTimesString );
@@ -656,9 +657,9 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
         displayClear();
         int food_time;
         int inicial =  (int)(displayUserPosition/4)*4 - 4;
-        for (int i = 0 ; i < qtimes && i < 3 ; i++){
+        for (int i = 0 ; i < qtimes && i < 4 ; i++){
             food_time = get_time_for_food( i + inicial );
-            sprintf(setFoodTimesString, " %2d:%.2d", (int) food_time/6, food_time % 6 *60); 
+            sprintf(setFoodTimesString, " %2d:%.2d ", (int) food_time/(60/FOOD_TIME_MINUTES_INCREMENT), food_time % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT); 
             displayPositionStringWrite ( 0, i , setFoodTimesString );
         }
         set_user_cursor( displayUserPosition % 4 );
@@ -679,7 +680,7 @@ static void userInterfaceAddFoodTime(){
             else    adding_hour++; // aumentar una hora
             scroll.disableUp();
         }
-        else if (scroll.Down() ){
+        if (scroll.Down() ){
             if( adding_hour == 0 ) adding_hour = 23;
             else    adding_hour--; // disminuir una hora
             scroll.disableDown();
@@ -770,20 +771,26 @@ static void userInterfaceModifyFoodTime( ){
             scroll.disableDown();
         }
         if ( scroll.Pressed() ) {
+            static bool debounce = false;
             scroll.disablePressed();
-            settingFoodTimeState = FOOD_MINUTE_STATE;
+            if ( debounce ){
+                debounce = false;
+                scroll.disablePressed();
+                settingFoodTimeState = FOOD_MINUTE_STATE;
+            }
+            else debounce = true;
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-        sprintf(setTimeString, "*%2d:%.2d  Supr  Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
+        sprintf(setTimeString, "*%2d:%.2d  Listo  Supr", (int) food_time_selected/(60/FOOD_TIME_MINUTES_INCREMENT), food_time_selected % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT); 
     break;
 
     case FOOD_MINUTE_STATE:
         if ( scroll.Up() ) {
-            food_time_selected = food_time_selected + hour_min_2_food_number( 0 , FOOD_TIME_MINUTES_INCREMENT ); 
+            food_time_selected = food_time_selected + 1; 
             scroll.disableUp();
         }
         else if (scroll.Down() ){
-            food_time_selected = food_time_selected - hour_min_2_food_number( 0, FOOD_TIME_MINUTES_INCREMENT ); 
+            food_time_selected = food_time_selected - 1; 
             scroll.disableDown();
         }
         if ( scroll.Pressed() ){
@@ -792,7 +799,7 @@ static void userInterfaceModifyFoodTime( ){
             
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));
-        sprintf(setTimeString, " %2d:*%.2d  Supr  Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
+        sprintf(setTimeString, " %2d:*%.2d  Listo  Supr", (int) food_time_selected/(60/FOOD_TIME_MINUTES_INCREMENT), food_time_selected % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT); 
     break;
     case ASK_DELETE_TIME_STATE:
         if ( scroll.Pressed() ) {
@@ -802,28 +809,29 @@ static void userInterfaceModifyFoodTime( ){
             displayClear();
             return;
         }
+        else if( scroll.Down() ) {
+            scroll.disableDown();
+            settingFoodTimeState = ASK_OK_TIME_STATE;
+        }
+        sprintf(setTimeString, " %2d:%.2d  Listo  *Supr", (int) food_time_selected/(60/FOOD_TIME_MINUTES_INCREMENT), food_time_selected % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT); 
+    break;
+    case ASK_OK_TIME_STATE:
+        if ( scroll.Pressed() ) {
+            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
+            settingFoodTimeState = FOOD_HOUR_STATE;
+            scroll.disablePressed();
+            displayClear();
+            return;
+        }
         else if( scroll.Up() ) {
             scroll.disableUp();
-            settingFoodTimeState = ASK_OK_TIME_STATE;
+            settingFoodTimeState = ASK_DELETE_TIME_STATE;
         }
         else if( scroll.Down() ) {
             scroll.disableDown();
             settingFoodTimeState = FOOD_MINUTE_STATE;
         }
-        sprintf(setTimeString, " %2d:%.2d  *Supr  Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
-    break;
-    case ASK_OK_TIME_STATE:
-        if ( scroll.Pressed() ) {
-            displayState = DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE;
-            scroll.disablePressed();
-            displayClear();
-            return;
-        }
-        else if( scroll.Down() ) {
-            scroll.disableDown();
-            settingFoodTimeState = ASK_DELETE_TIME_STATE;
-        }
-        sprintf(setTimeString, " %2d:%.2d  Supr  *Listo", (int)(food_time_selected * FOOD_TIME_MINUTES_INCREMENT/60), (food_time_selected * FOOD_TIME_MINUTES_INCREMENT) % 60);
+        sprintf(setTimeString, " %2d:%.2d  *Listo  Supr", (int) food_time_selected/(60/FOOD_TIME_MINUTES_INCREMENT), food_time_selected % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT); 
     break;
     }
 

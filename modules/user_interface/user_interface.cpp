@@ -95,6 +95,8 @@ static int index_food_time_selected = 0;
 static int displayUserPosition = 0;
 static int displayRefreshTimeOption = display_refresh_time_report;
 
+bool clearDisplay = false;
+
 int adding_hour = 0;
 int adding_minute = 0;
 
@@ -188,11 +190,14 @@ static void userPositionUpdate ()
     if ( scroll.Up() ){
         scroll.disableUp();
         displayUserPosition++;
+        if( !(displayUserPosition % 4) ) clearDisplay = true;
     }
     else if( scroll.Down() ){
         scroll.disableDown();
+        if( displayUserPosition != 0  && !(displayUserPosition % 4) ) clearDisplay = true;
         displayUserPosition--;
     }
+    
 }
 
 void printDisplay();
@@ -331,6 +336,7 @@ static void userInterfaceDisplayReportStateUpdate()
 static void userInterfaceDisplayAjustesStateUpdate()
 {
     displayRefreshTimeOption = display_fast_refresh_time;
+    static bool clearUp = false, clearDown = false;
 
     if( displayUserPosition > 5) 
         displayUserPosition = 5;
@@ -351,40 +357,44 @@ static void userInterfaceDisplayAjustesStateUpdate()
             }
         }
         return;
-        }
+    }
+
+    if(clearDisplay){
+        displayClear();
+        clearDisplay = false;
+    }
+
+    char ajustesString[21] = "";
+    switch( displayUserPosition )
+    {
+    case 0: case 1:case 2:case 3:
+        sprintf(ajustesString, " Volver  AJUSTES");
+        displayPositionStringWrite ( 0,0 , ajustesString );
     
-        char ajustesString[21] = "";
-        switch( displayUserPosition )
-        {
-        case 0: case 1:case 2:case 3:
-            sprintf(ajustesString, " Volver  AJUSTES");
-            displayPositionStringWrite ( 0,0 , ajustesString );
+        sprintf(ajustesString, " Cambiar fecha/hora ");
+        displayPositionStringWrite ( 0,1 , ajustesString );
         
-            sprintf(ajustesString, " Cambiar fecha/hora ");
-            displayPositionStringWrite ( 0,1 , ajustesString );
-            
-            sprintf(ajustesString, " Liberar alimento");
-            displayPositionStringWrite ( 0,2 , ajustesString );
-            
-            sprintf(ajustesString, " Programar horarios");
-            displayPositionStringWrite ( 0,3 , ajustesString );
-            
-            set_user_cursor( displayUserPosition );    
-        break;
-        default:
-            displayClear();
-            sprintf(ajustesString, " Tara de bowl");
-            displayPositionStringWrite ( 0,0 , ajustesString );
+        sprintf(ajustesString, " Liberar alimento");
+        displayPositionStringWrite ( 0,2 , ajustesString );
+        
+        sprintf(ajustesString, " Programar horarios");
+        displayPositionStringWrite ( 0,3 , ajustesString );
+        
+        set_user_cursor( displayUserPosition );  
+    break;
+    default:
+        sprintf(ajustesString, " Tara de bowl");
+        displayPositionStringWrite ( 0,0 , ajustesString );
 
-            sprintf(ajustesString, "Alarma almacen.");
-            if( isAlarmEnable() )
-                sprintf(ajustesString, "%s  ON", ajustesString );
-            else
-                sprintf(ajustesString, "%s OFF", ajustesString );
-            displayPositionStringWrite ( 1,1 , ajustesString );
+        sprintf(ajustesString, " Alarma almacen.");
+        if( isAlarmEnable() )
+            sprintf(ajustesString, "%s  ON", ajustesString );
+        else
+            sprintf(ajustesString, "%s OFF", ajustesString );
+        displayPositionStringWrite ( 0,1 , ajustesString );
 
-            set_user_cursor( displayUserPosition - 4);
-        break;
+        set_user_cursor( displayUserPosition - 4);
+    break;
     }
 }
 
@@ -629,6 +639,11 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
         return;
     }
 
+    if(clearDisplay){
+        displayClear();
+        clearDisplay = false;
+    }
+
     char setFoodTimesString[21] = "";
     switch( displayUserPosition ){
     case 0: case 1: case 2: case 3:
@@ -654,7 +669,7 @@ static void userInterfaceDisplaySetFoodTimesStateUpdate()
         set_user_cursor( displayUserPosition );
     break;
     default:{
-        displayClear();
+        // displayClear();
         int food_time;
         int inicial =  (int)(displayUserPosition/4)*4 - 4;
         for (int i = 0 ; i < qtimes && i < 4 ; i++){
@@ -795,7 +810,7 @@ static void userInterfaceModifyFoodTime( ){
         }
         if ( scroll.Pressed() ){
             scroll.disablePressed();
-            settingFoodTimeState = ASK_DELETE_TIME_STATE;
+            settingFoodTimeState = ASK_OK_TIME_STATE;
             
         }
         change_food_time( food_time_selected , get_time_for_food( index_food_time_selected ));

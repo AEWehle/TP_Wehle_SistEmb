@@ -28,6 +28,9 @@ private:
     encoderState_t scrollState;
     bool scrollUp;
     bool scrollDown;
+    int count;
+    uint8_t state;
+    void proc_change(int s);
 
 //=====[Declarations (prototypes) of public functions]=========================
 public:

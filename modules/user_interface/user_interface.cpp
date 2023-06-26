@@ -422,7 +422,7 @@ static void userInterfaceDisplaySetDateTimeStateUpdate()
     sprintf(setDateTimeString, " Fecha   %.2d/%.2d/%4d", timeinfo->tm_mday, timeinfo->tm_mon, 1900 + timeinfo->tm_year);
     displayPositionStringWrite ( 0,1 , setDateTimeString );
 
-    sprintf(setDateTimeString, " Hora     %2d:%.2d", timeinfo->tm_hour, timeinfo->tm_min);
+    sprintf(setDateTimeString, " Hora     %2d:%.2d   ", timeinfo->tm_hour, timeinfo->tm_min);
     displayPositionStringWrite ( 0,2 , setDateTimeString );
 
     sprintf(setDateTimeString, "Listo");

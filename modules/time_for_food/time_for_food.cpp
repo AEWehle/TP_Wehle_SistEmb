@@ -97,7 +97,8 @@ void set_times_saved(){
 }
 
 void set_food_load_required( float new_food_load ){
-    food_load_required = new_food_load;
+    if ( new_food_load >= 5 && new_food_load <( FOOD_LOAD_LIMIT - 10 ))
+        food_load_required = new_food_load;
 }
 float get_food_load_required( ){
     return food_load_required;

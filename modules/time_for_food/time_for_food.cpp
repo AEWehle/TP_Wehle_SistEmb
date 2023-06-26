@@ -37,7 +37,7 @@ static food_time_t times_for_food[MAX_TIMES_DAY];
 
 bool charging = false;
 loop_mode_t food_mode = CLOSED;
-const float FOOD_LOAD_DEFAULT = 100;//g
+const float FOOD_LOAD_DEFAULT = 15;//g
 static float food_load_required = FOOD_LOAD_DEFAULT;
 
 //=====[Declarations (prototypes) of private functions]========================
@@ -83,7 +83,7 @@ void timeForFoodUpdate()
 }
 
 food_time_t hour_min_2_food_number( int hour, int min ){
-    return (food_time_t) (int)( (hour*60 + min) / FOOD_TIME_MINUTES_INCREMENT);
+    return (food_time_t) (int)( (hour*60 + (int)(min/10)*10) / FOOD_TIME_MINUTES_INCREMENT);
 }
 
 bool get_if_save_times_in_SD(){

@@ -587,7 +587,7 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
         return;
     }
     if( scroll.Down() || scroll.Up() ) {
-        bowl_charge( 30.0 ); // le suma 30g al tacho 
+        bowl_charge( 10.0 ); // le suma 10g al tacho 
         scroll.disableUp();
         scroll.disableDown();
     }

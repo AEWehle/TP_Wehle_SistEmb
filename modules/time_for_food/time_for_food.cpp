@@ -28,8 +28,9 @@ bool save_in_SD = false;
 static int timesIndex = 0;
 // horarios cada 10 minutos desde 00:00 a 23:50, opción desde 0 a 143 
 static food_time_t times_for_food[MAX_TIMES_DAY]; 
-// hora =  (número // 6), div entera de 6
-// minutos = (número % 6) *10, el resto*10
+// hora   (int) food_time/(60/FOOD_TIME_MINUTES_INCREMENT)
+// minutos   food_time % (60/FOOD_TIME_MINUTES_INCREMENT)*FOOD_TIME_MINUTES_INCREMENT)
+// food number  (food_time_t) (int)( (hour*60 + min) / FOOD_TIME_MINUTES_INCREMENT);
 
 
 //=====[Declaration and initialization of private global variables]============
@@ -82,7 +83,7 @@ void timeForFoodUpdate()
 }
 
 food_time_t hour_min_2_food_number( int hour, int min ){
-    return (food_time_t) (int)( MAX_TIMES_DAY* hour/24 + min % FOOD_TIME_MINUTES_INCREMENT); // max times per day (60/FOOD_TIME_MINUTES_INCREMENT)*hour = number
+    return (food_time_t) (int)( (hour*60 + min) / FOOD_TIME_MINUTES_INCREMENT);
 }
 
 bool get_if_save_times_in_SD(){
@@ -128,7 +129,7 @@ int get_time_for_food( int index ){
 bool its_time( int hour, int min, int seconds )
 {   
     if ( seconds == 0 ){
-        food_time_t time_numer = hour * 6 + min;
+        food_time_t time_numer = hour_min_2_food_number( hour, min );
 
         for( int i = 0; i < timesIndex ; i++){
             if ( time_numer == times_for_food[i] ) 

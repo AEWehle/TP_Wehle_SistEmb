@@ -219,7 +219,7 @@ static void userInterfaceDisplayUpdate()
         //     timeAccumPrintDisplay = time(NULL);  // OPCION RAPIDA
         //     printDisplay();
         // }                                        // OPCION RAPIDA
-        if(time(NULL) % 10 ) displayClear();
+        if(time(NULL) % 10 == 0 ) displayClear();
         if( time(NULL) >= timeAccumPrintDisplay + 30 ){ // cada 30 seg vuelvo a report
             timeAccumPrintDisplay = time(NULL);
             if(displayState == DISPLAY_AJUSTES_STATE || displayState == DISPLAY_AJUSTES_SET_DATE_TIME_STATE\

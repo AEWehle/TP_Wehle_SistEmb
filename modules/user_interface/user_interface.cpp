@@ -554,7 +554,7 @@ static void displaySetTimeState()
             displayUserPosition = 1;
             displayState = DISPLAY_AJUSTES_SET_DATE_TIME_STATE;
         }
-        sprintf(setTimeString, "%2d:*%.2d", rtcTime -> tm_hour, rtcTime -> tm_min);
+        sprintf(setTimeString, "%2d:*%.2d ", rtcTime -> tm_hour, rtcTime -> tm_min);
     break;
     }
 

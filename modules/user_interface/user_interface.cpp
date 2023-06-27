@@ -223,8 +223,8 @@ static void userInterfaceDisplayUpdate()
         if( time(NULL) >= timeAccumPrintDisplay + 30 ){ // cada 30 seg vuelvo a report
             timeAccumPrintDisplay = time(NULL);
             if(displayState == DISPLAY_AJUSTES_STATE || displayState == DISPLAY_AJUSTES_SET_DATE_TIME_STATE\
-            || DISPLAY_AJUSTES_RELEASE_FOOD_STATE || DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE \
-            || DISPLAY_AJUSTES_ALARM_STORAGE_STATE || DISPLAY_AJUSTES_BOWL_TARE_STATE)
+            || displayState == DISPLAY_AJUSTES_RELEASE_FOOD_STATE || displayState == DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE \
+            || displayState == DISPLAY_AJUSTES_ALARM_STORAGE_STATE || displayState == DISPLAY_AJUSTES_BOWL_TARE_STATE)
             userInterfaceDisplayReportStateUpdate();
         }
 

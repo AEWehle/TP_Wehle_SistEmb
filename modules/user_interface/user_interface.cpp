@@ -219,10 +219,13 @@ static void userInterfaceDisplayUpdate()
         //     timeAccumPrintDisplay = time(NULL);  // OPCION RAPIDA
         //     printDisplay();
         // }                                        // OPCION RAPIDA
-        
-        if(timeAccumPrintDisplay >= time(NULL) + 20){ // cada 20 seg limpio display de ruido
+        if(time(NULL) % 10 ) displayClear();
+        if( time(NULL) >= timeAccumPrintDisplay + 30 ){ // cada 30 seg vuelvo a report
             timeAccumPrintDisplay = time(NULL);
-            displayClear();
+            if(displayState == DISPLAY_AJUSTES_STATE || displayState == DISPLAY_AJUSTES_SET_DATE_TIME_STATE\
+            || DISPLAY_AJUSTES_RELEASE_FOOD_STATE || DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE \
+            || DISPLAY_AJUSTES_ALARM_STORAGE_STATE || DISPLAY_AJUSTES_BOWL_TARE_STATE)
+            userInterfaceDisplayReportStateUpdate();
         }
 
         switch ( displayState ) {
@@ -587,7 +590,7 @@ static void userInterfaceDisplayReleaseFoodStateUpdate()
         return;
     }
     if( scroll.Down() || scroll.Up() ) {
-        bowl_charge( 10.0 ); // le suma 10g al tacho 
+        bowl_charge( 5.0 ); // le suma 5g al tacho 
         scroll.disableUp();
         scroll.disableDown();
     }

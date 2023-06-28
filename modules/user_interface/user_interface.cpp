@@ -207,7 +207,7 @@ static void userInterfaceDisplayUpdate()
     // OPCION RAPIDA
     static int timeAccumDisplay = 0;    // OPCION RAPIDA
     timeAccumDisplay++;                 // OPCION RAPIDA
-    static time_t timeAccumPrintDisplay = time(NULL);// OPCION RAPIDA
+    // static time_t timeAccumPrintDisplay = time(NULL);// OPCION RAPIDA
     if( timeAccumDisplay >=  displayRefreshTimeOption){// OPCION RAPIDA
         timeAccumDisplay = 0;           // OPCION RAPIDA
 
@@ -219,14 +219,14 @@ static void userInterfaceDisplayUpdate()
         //     timeAccumPrintDisplay = time(NULL);  // OPCION RAPIDA
         //     printDisplay();
         // }                                        // OPCION RAPIDA
-        if(time(NULL) % 10 == 0 ) displayClear();
-        if( time(NULL) >= timeAccumPrintDisplay + 30 ){ // cada 30 seg vuelvo a report
-            timeAccumPrintDisplay = time(NULL);
-            if(displayState == DISPLAY_AJUSTES_STATE || displayState == DISPLAY_AJUSTES_SET_DATE_TIME_STATE\
-            || displayState == DISPLAY_AJUSTES_RELEASE_FOOD_STATE || displayState == DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE \
-            || displayState == DISPLAY_AJUSTES_ALARM_STORAGE_STATE || displayState == DISPLAY_AJUSTES_BOWL_TARE_STATE)
-            userInterfaceDisplayReportStateUpdate();
-        }
+        if( time(NULL) % 20 == 0 ) displayClear();
+        // if( time(NULL) >= timeAccumPrintDisplay + 30 ){ // cada 30 seg vuelvo a report
+        //     timeAccumPrintDisplay = time(NULL);
+        //     if(displayState == DISPLAY_AJUSTES_STATE || displayState == DISPLAY_AJUSTES_SET_DATE_TIME_STATE\
+        //     || displayState == DISPLAY_AJUSTES_RELEASE_FOOD_STATE || displayState == DISPLAY_AJUSTES_SET_FOOD_TIMES_STATE \
+        //     || displayState == DISPLAY_AJUSTES_ALARM_STORAGE_STATE || displayState == DISPLAY_AJUSTES_BOWL_TARE_STATE)
+        //     userInterfaceDisplayReportStateUpdate();
+        // }
 
         switch ( displayState ) {
         case DISPLAY_REPORT_STATE:

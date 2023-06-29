@@ -1,6 +1,10 @@
-# Dispenser de alimentos para mascotas
+# Time For Food - Dispenser de alimentos para mascotas
 Trabajo práctico final de sistemas embebidos. Dispenser de alimento para mascotas automático por horarios con control de peso,
 utilizando como plataforma de desarrollo una placa STM32 NUCLEO*F429ZI.
+
+<p align=center>
+    <img src="images/presentation.jpg" alt="Fotofrente" height="300"/>
+</p>
 
 [Repositorio](https://github.com/AEWehle/TP_Wehle_SistEmb)
 

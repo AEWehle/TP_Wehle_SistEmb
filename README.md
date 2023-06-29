@@ -14,7 +14,7 @@ utilizando como plataforma de desarrollo una placa STM32 NUCLEO*F429ZI.
 ## Descripción y Diagrama de bloques
 El dispenser de alimentos automático y control de peso desarrollado en este trabajo cuenta con:
 
-Una placa con microcontrolador NUCLEO*F429ZI de STM32, que se encarga de la administración y control de todas las características.
+Una placa con microcontrolador NUCLEO-F429ZI de STM32, que se encarga de la administración y control de todas las características.
 
 * Un recipiente de almacenamiento con sensor de bajo almacenamiento.
 

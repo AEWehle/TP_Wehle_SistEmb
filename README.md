@@ -4,7 +4,7 @@ utilizando como plataforma de desarrollo una placa STM32 NUCLEO*F429ZI.
 
 [Repositorio](https://github.com/AEWehle/TP_Wehle_SistEmb)
 
-Memoria y documentación: A agregar
+[Memoria y documentación](https://docs.google.com/document/d/1N_jcAnnVCSna07N2jzv9-zDmV-DazLcwWZghMPTM5UA/edit?usp=sharing)
 
 <p align=center>
     <img src="images/FotoFrente.jpg" alt="Fotofrente" height="175"/>

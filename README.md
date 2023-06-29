@@ -119,5 +119,8 @@ Al presionar cambiará de estado. Si el almacenmaiento está VACIO sonará una a
 
 El estado de VACIO se llega cuando se intenta liberar alimento y no se modifica el peso en el bowl.
 
+## Configuración desde la computadora
+
+Se puede utilizar el dispositivo conectacntolo a la computadora con una terminal a 11520 de baudrate. Permite configurar lo mismo que desde la interfaz de usuario pero además permite ver los eventos almavcenados en la tarjeta SD.
 
 

@@ -6,6 +6,11 @@ utilizando como plataforma de desarrollo una placa STM32 NUCLEO*F429ZI.
 
 Memoria y documentación: A agregar
 
+<p align=center>
+    <img src="images/FotoFrente.jpg" alt="Fotofrente" height="175"/>
+    <img src="images/FotoPerfil.jpg" alt="FotoPerfil" height="175"/>
+</p>
+
 ## Descripción y Diagrama de bloques
 El dispenser de alimentos automático y control de peso desarrollado en este trabajo cuenta con:
 

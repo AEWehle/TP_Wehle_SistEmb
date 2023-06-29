@@ -1,6 +1,14 @@
+<p align=center>
+    <img src="images/logo.svg" alt="logo" height="300"/>
+</p>
+
 # Time For Food - Dispenser de alimentos para mascotas
 Trabajo práctico final de sistemas embebidos. 
 Time For Food es un dispenser de alimento para mascotas por horarios, con control de peso configurable, registro de eventos en tarjeta SD, restauración de horarios en caso de corte de luz, alarma, y una interfaz de usuario a partir de un display y un encoder rotativo para su completa configuración. Se programa en lenguaje C++ la placa NUCLEO-F429ZI de STM32.
+
+
+
+Time For Food is a pet food dispenser by schedules, with configurable weight control, event log on SD card, restoration of schedules in case of power outage, alarm, and a user interface from a display and a rotary encoder for complete configuration. The STM32 NUCLEO-F429ZI board is programmed in C++ language.
 
 <p align=center>
     <img src="images/presentation.jpg" alt="Fotofrente" height="300"/>

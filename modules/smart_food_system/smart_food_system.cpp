@@ -12,7 +12,6 @@
 #include "bowl.h"
 #include "food_storage.h"
 #include "time_for_food.h"
-#include "siren.h"
 
 
 //=====[Declaration of private defines]========================================
@@ -54,7 +53,7 @@ void smartFoodSystemInit()
 
 void smartFoodSystemUpdate()
 {
-    if( time(NULL) != miTime ){
+    if( time(NULL) != miTime ){ // actualización cada 1 segundo
         timeForFoodUpdate();
         foodStorageUpdate();
         bowlUpdate();
@@ -62,17 +61,13 @@ void smartFoodSystemUpdate()
         miTime = time(NULL);
     }
     
-    if( time_increment_update >=  system_time_update ){
-        motorControlUpdate();
+    if( time_increment_update >=  system_time_update ){ // actualización cada 10 ms
         pcSerialComUpdate();
         time_increment_update = 0;
     }
     
     userInterfaceUpdate();
     time_increment_update++;
-    scrollUpdate();
-    buttonsUpdate();
-    if( isAlarmEnable() ) sirenUpdate( 30 );
     
     delay(SYSTEM_TIME_INCREMENT_MS);
 }

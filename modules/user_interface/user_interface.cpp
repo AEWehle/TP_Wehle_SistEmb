@@ -16,6 +16,8 @@
 #include "time.h"
 #include "Scroll.h"
 #include "pc_serial_com.h"
+#include "siren.h"
+
 
 
 //=====[Declaration of private defines]========================================
@@ -142,6 +144,9 @@ void userInterfaceInit()
 
 void userInterfaceUpdate()
 {
+    if( isAlarmEnable() ) sirenUpdate( 30 );
+    scrollUpdate();
+    buttonsUpdate();
     userInterfaceDisplayUpdate();
 } 
 

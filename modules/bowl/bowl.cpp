@@ -86,6 +86,7 @@ float get_food_load() {
 
 void bowlUpdate()
 {
+    motorControlUpdate();
     food_load = balanza.get_units(10);
     if( chargingState ){
         if ( time(NULL) >= (MAX_TIME_RELEASING_FOOD_SECONDS + initial_time_releasing_food)){

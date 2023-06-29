@@ -53,13 +53,10 @@ void motorDeactivation()
 
 void motorControlUpdate()
 {
-            // pcSerialComStringWrite( "motor update" );
     if( motorState == ACTIVE ){
         motorPin = HIGH;
-      // motorState = STOPPED;
     }
-    else{ // ( motorState == STOPPED )
+    else{ 
         motorPin = LOW;
-        // motorState = ACTIVE;
     }
 }

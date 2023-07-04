@@ -17,7 +17,6 @@ uint8_t shiftIn(DigitalIn& dataPin, DigitalOut& clockPin, uint8_t bitOrder) {
  
     for (i = 0; i < 8; ++i) {
         clockPin.write(ON);
-        // digitalWrite(clockPin, HIGH);
         if (bitOrder == LSBFIRST)
             value |= (dataPin.read()!=OFF) << i;
         else

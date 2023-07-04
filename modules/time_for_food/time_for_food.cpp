@@ -82,10 +82,10 @@ void timeForFoodUpdate()
     else charging = false;
 }
 
-food_time_t hour_min_2_food_number( int hour, int min ){
-    return (food_time_t) (int) (hour*60 / FOOD_TIME_MINUTES_INCREMENT) + min ;
      // no se divide a los minutos por el incremento porque sino repetiria la expulsion 
      //los 10 minutos correspondientes a su decena
+food_time_t hour_min_2_food_number( int hour, int min ){
+    return (food_time_t) hour * (int)(60/FOOD_TIME_MINUTES_INCREMENT)  + (int) (min/FOOD_TIME_MINUTES_INCREMENT);
 }
 
 bool get_if_save_times_in_SD(){

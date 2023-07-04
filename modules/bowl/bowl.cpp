@@ -7,9 +7,6 @@
 #include "load_sensorHX711.h"
 #include "motor.h"
 #include "food_storage.h"
-// #include "siren.h"
-
-// sacar, solo prueba
 #include "pc_serial_com.h"
 
 //=====[Declaration of private defines]========================================

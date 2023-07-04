@@ -6,7 +6,7 @@
 #include "event_log.h"
 
 #include "user_interface.h"
-#include "date_and_time.h"
+// #include "date_and_time.h"
 #include "pc_serial_com.h"
 #include "sd_card.h"
 #include "bowl.h"

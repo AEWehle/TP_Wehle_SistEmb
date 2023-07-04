@@ -5,7 +5,7 @@
 
 #include "pc_serial_com.h"
 
-#include "date_and_time.h"
+// #include "date_and_time.h"
 #include "event_log.h"
 #include "motor.h"
 #include "sd_card.h"

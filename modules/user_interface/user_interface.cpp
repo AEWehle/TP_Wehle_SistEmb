@@ -7,7 +7,6 @@
 #include "user_interface.h"
 
 #include "smart_food_system.h"
-#include "date_and_time.h"
 #include "display.h"
 #include "motor.h"
 #include "bowl.h"

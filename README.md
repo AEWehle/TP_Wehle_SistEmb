@@ -18,6 +18,9 @@ Time For Food is a pet food dispenser by schedules, with configurable weight con
 
 [Memoria y documentación](https://docs.google.com/document/d/1N_jcAnnVCSna07N2jzv9-zDmV-DazLcwWZghMPTM5UA/edit?usp=sharing)
 
+[Video breve 00:02:23](https://github.com/AEWehle/TP_Wehle_SistEmb/blob/master/video%20-%20time%20for%20food.mp4). 
+[link secundario al video](https://drive.google.com/file/d/1A6ycF8dj406sMSafjcJQT6d2JPbaW2a8/view?usp=sharing)
+
 <p align=center>
     <img src="images/FotoFrente.jpg" alt="Fotofrente" height="175"/>
     <img src="images/FotoPerfil.jpg" alt="FotoPerfil" height="175"/>

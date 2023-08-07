@@ -53,7 +53,7 @@ A NUCLEO-F429ZI board, administration and control of all the features.
 In the next block diagram all the components ar shown.
 
 <p align=center>
-    <img src="images/diagBlock.png" alt="Diagrama en bloques del proyecto" height="350"/>
+    <img src="images/diagBlock-en.png" alt="Block diagram" height="350"/>
 </p>
 
 thid dispenser differ from existing ones for:

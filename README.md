@@ -2,13 +2,145 @@
     <img src="images/logo.svg" alt="logo" height="300"/>
 </p>
 
+# Time For Food - Automatic food dispenser for pets
+Time For Food is a food dispenser for pets regulated by time, desired food weigth, event log in SD card, settings retsoration in case of power fault, alarm, and a user interface from a display and a rotary encoder for complete configuration. The STM32 NUCLEO-F429ZI board is programmed in C++ language.
+
+<p align=center>
+    <img src="images/presentation.jpg" alt="Fotofrente" height="300"/>
+</p>
+
+[Repository](https://github.com/AEWehle/TP_Wehle_SistEmb)
+
+[Memory and documentation](https://docs.google.com/document/d/1N_jcAnnVCSna07N2jzv9-zDmV-DazLcwWZghMPTM5UA/edit?usp=sharing)
+
+[Short video 00:02:23](https://github.com/AEWehle/TP_Wehle_SistEmb/blob/master/video%20-%20time%20for%20food.mp4). 
+[Secondary link for video](https://drive.google.com/file/d/1A6ycF8dj406sMSafjcJQT6d2JPbaW2a8/view?usp=sharing)
+
+<p align=center>
+    <img src="images/FotoFrente.jpg" alt="Fotofrente" height="175"/>
+    <img src="images/FotoPerfil.jpg" alt="FotoPerfil" height="175"/>
+</p>
+
+## Description and block diagram
+The automatic food dispenser with weigth control developed has the following characteristics:
+
+A NUCLEO-F429ZI board, administration and control of all the features.
+
+* A storage ocntainer for food with low food sensor.
+
+* Motor that pushes the food.
+
+* Releasing food by time. Available up to 144 per day, that is, a time every 10 minutes.
+
+* Bowl food weigth control. Select for Release up to a desired food load or Always release a desired food load.
+
+* A knob for manual food release.
+
+* A micro SD card for event log and save settings. 
+
+* The events are food decrease, food increase and empty storage. The events have the time, food load in bowl and storage state.
+
+* The times for food are saved on the SD card to be restored in case of power fault.
+
+* Empty storage alarm with sound option. Triggers when its time for food but no food is released.
+
+* A user interface with siplay and encoder. Show the following four time for food, date and time, actual food load and storage state.
+
+* The user interface allows set the Time for food, desired loas, date and time, and allows manual releasing food, bowl tare and enable/disable sound alarm.
+
+* powered by cellphone charger.
+
+In the next block diagram all the components ar shown.
+
+<p align=center>
+    <img src="images/diagBlock.png" alt="Diagrama en bloques del proyecto" height="350"/>
+</p>
+
+thid dispenser differ from existing ones for:
+
+* Event log. The user has control over when and how much their pet eats.
+
+* Food availability for the pet in case of power fault.
+
+* Empty storage alarm.
+
+## Repository organisation
+
+The repository has de next structure
+
+    .
+    ├── images
+    ├── modules
+    │   ├── motor
+    │   ├── pc_serial_com
+    │   ├── time_for_food
+    │   ├── sd_card
+    │   └── ...
+    ├── main.cpp
+    ├── README.md
+    └── ...
+
+
+Where the files and folders are:
+* `images/`: folder for images.
+* `modules/`: folder with the system scripts.
+* `main.cpp`: System main fail.
+* `README.md`.
+* Other files like licence and settings of Mbed, etc.
+
+
+## User manual
+
+In the reppport display are shown
+En la pantalla principal are shown the following four time for food, date and time, actual food load and storage state (OK, BAJO o VACIO).
+
+Pressing it goes to setting:
+
+1* Back to repport.
+2* Change date and time
+3* Release food.
+4* Food time and load programing. 
+5* Bowl tare.
+6* Enable/disable sound alar.
+
+### Change date and time
+
+With the encoder select the actual date and time.
+
+### Release food
+
+Whit the encoder scroll the motor pushes food to the bowl, presseing returns to settings.
+
+### Food time and load programing
+
+1* Back to settings
+3* Release food up to. Release food util the desired food. Scroll For change the desired food load. Closed loop.
+4* Always release. Release the same food load. Scroll For change the desired food load. Open loop.
+5* Add a Time for food.
+6* Time for food list. You can delete or modify them.
+
+### Bowl tare
+
+If the bowl pet is changed then you must set a new bowl tare with this new one empty.
+
+### Enable/disable sound alarm
+
+Presseing swtitch his state. If ON and the storage is EMPTY, a sound notify every 30 minutes and the repport display show EMPTY storage state. If OFF the repport display show EMPTY storage state.
+
+The EMPTY state trigger when it try release food but the food load in bowl does not change.
+
+## Settings from PC
+
+Using PC serial communication at 11520 baudrate you have accessibility for all this settings and also view the event log.
+
+
+<p align=center>
+    <img src="images/logo.svg" alt="logo" height="300"/>
+</p>
+
 # Time For Food - Dispenser de alimentos para mascotas
 Trabajo práctico final de sistemas embebidos. 
 Time For Food es un dispenser de alimento para mascotas por horarios, con control de peso configurable, registro de eventos en tarjeta SD, restauración de horarios en caso de corte de luz, alarma, y una interfaz de usuario a partir de un display y un encoder rotativo para su completa configuración. Se programa en lenguaje C++ la placa NUCLEO-F429ZI de STM32.
-
-
-
-Time For Food is a pet food dispenser by schedules, with configurable weight control, event log on SD card, restoration of schedules in case of power outage, alarm, and a user interface from a display and a rotary encoder for complete configuration. The STM32 NUCLEO-F429ZI board is programmed in C++ language.
 
 <p align=center>
     <img src="images/presentation.jpg" alt="Fotofrente" height="300"/>
@@ -110,17 +242,17 @@ Al presionar se pasa a la sección de ajustes con las opciones:
 
 ### Cambiar Fecha y Hora
 
-Se puede volver al menu de ajustes o presionando se puede elegir qué valor modificar.
+Se puede volver al menu de ajustes o presionando se puede elegir qué valor modificar. Al girar se modifica el valor o se cambia de renglón.
 
 ### Liberar alimento
 
-Girando la perilla se acciona el motor para liberar alimento, al presionar se vuelve a menu de ajustes, al girar se modifica el valor o se cambia de renglón.
+Girando la perilla se acciona el motor para liberar alimento, al presionar se vuelve a menu de ajustes.
 
 ### Programar horarios
 
 1* Volver a ajustes
-3* Liberar hasta. Activa modo lazo cerrado y girando cambia el peso a liberar.
-4* Liberar siempre. Activa el modo lazo cerrado y establece el peso límite.
+3* Liberar hasta. Activa modo lazo cerrado y girando y establece el peso límite.
+4* Liberar siempre. Activa el modo lazo abierto  y cambia el peso a liberar.
 5* Agregar un horario.
 6* Lista de los horarios guardados y que se pueden modificar o borrar.
 
